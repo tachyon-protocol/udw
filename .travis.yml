@@ -7,4 +7,6 @@ git:
 notifications:
   email: false
 script:
+  - mkdir -p github.com/tachyon-protocol
+  - mv ./ github.com/tachyon-protocol
   - go test -v -race ./...
