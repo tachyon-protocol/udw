@@ -1,3 +1,5 @@
+// +build darwin freebsd openbsd netbsd
+
 package udwFileFastWalk
 
 import "syscall"
