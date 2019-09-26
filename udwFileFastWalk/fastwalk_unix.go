@@ -1,3 +1,6 @@
+// +build linux darwin freebsd openbsd netbsd
+// +build !appengine
+
 package udwFileFastWalk
 
 import (
