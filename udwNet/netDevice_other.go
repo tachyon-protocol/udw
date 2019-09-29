@@ -1,3 +1,5 @@
+// +build !windows,!js
+
 package udwNet
 
 import "net"

@@ -3,10 +3,9 @@ package udwDebug
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/tachyon-protocol/udw/udwReflect"
 	"os"
 	"reflect"
-
-	"github.com/tachyon-protocol/udw/udwReflect"
 )
 
 func Println(objList ...interface{}) {

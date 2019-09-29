@@ -1,9 +1,9 @@
 package udwChan
 
 import (
-	"sync"
 	"github.com/tachyon-protocol/udw/udwErr"
 	"strings"
+	"sync"
 )
 
 type Chan struct {
@@ -39,12 +39,12 @@ func (c *Chan) Send(data interface{}) (isClose bool) {
 	return
 }
 
-func (c *Chan) SendIfEmpty(data interface{}) (isClose bool,isSuccess bool) {
+func (c *Chan) SendIfEmpty(data interface{}) (isClose bool, isSuccess bool) {
 	c.lock.RLock()
 	isClose = c.isClosed
 	if isClose {
 		c.lock.RUnlock()
-		return true,false
+		return true, false
 	}
 	select {
 	case c.ch <- data:
@@ -73,12 +73,13 @@ func (c *Chan) Receive() (data interface{}, isClose bool) {
 }
 
 func (c *Chan) Close() {
+
 	err := udwErr.PanicToError(func() {
 		close(c.closeSignal)
 	})
 	if err != nil {
-		if !strings.Contains(err.Error(),"close of closed channel") {
-			panic("n2mu5ht9p8 "+err.Error())
+		if !strings.Contains(err.Error(), "close of closed channel") {
+			panic("n2mu5ht9p8 " + err.Error())
 		}
 	}
 	c.lock.Lock()

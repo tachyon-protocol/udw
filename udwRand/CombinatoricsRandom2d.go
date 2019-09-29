@@ -2,7 +2,6 @@ package udwRand
 
 import (
 	"fmt"
-
 	"github.com/tachyon-protocol/udw/udwMath"
 	"github.com/tachyon-protocol/udw/udwSlice"
 	"github.com/tachyon-protocol/udw/udwSort"
