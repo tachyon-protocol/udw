@@ -2,11 +2,10 @@ package udwNet
 
 import (
 	"fmt"
-	"io"
-	"net"
-
 	"github.com/tachyon-protocol/udw/udwIo"
 	"github.com/tachyon-protocol/udw/udwRandNewId"
+	"io"
+	"net"
 )
 
 type connRwcer struct {

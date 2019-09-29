@@ -1,17 +1,16 @@
 package udwFile
 
 import (
-	"os"
-	"path/filepath"
-	"time"
-
 	"fmt"
 	"github.com/tachyon-protocol/udw/udwCmd"
 	"github.com/tachyon-protocol/udw/udwPlatform"
 	"github.com/tachyon-protocol/udw/udwRand"
 	"github.com/tachyon-protocol/udw/udwStrings"
 	"github.com/tachyon-protocol/udw/udwTime"
+	"os"
+	"path/filepath"
 	"strings"
+	"time"
 )
 
 func MustEnsureBinPath(finalPath string) {

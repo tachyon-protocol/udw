@@ -1,3 +1,5 @@
+// +build !ios,!android,!macAppStore
+
 package udwLog
 
 import (

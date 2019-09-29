@@ -2,7 +2,7 @@ package udwFile
 
 import (
 	"bytes"
-//	"fmt"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -62,6 +62,21 @@ func MustCheckContentAndWriteFileWithMkdir(path string, content []byte) {
 	}
 	MustWriteFileWithMkdir(path, content)
 	return
+}
+
+func MustCheckContentAndWriteFileWithMkdirWithCorrectFold(path string, content []byte) {
+	if MustFileExist(path) {
+		if !MustIsFileOrDirectoryNameFoldCorrect(path) {
+			panic(fmt.Errorf("[MustCheckContentAndWriteFileWithMkdirWithCorrectFold] 1 [input:%s][file:%s]", path, MustGetFileOrDirectoryNameWithRealFold(path)))
+		}
+	} else {
+		MustMkdir(filepath.Dir(path))
+		if !MustIsFileOrDirectoryNameFoldCorrect(filepath.Dir(path)) {
+			panic(fmt.Errorf("[MustCheckContentAndWriteFileWithMkdirWithCorrectFold] 2 [input:%s][file:%s]", path, MustGetFileOrDirectoryNameWithRealFold(filepath.Dir(path))))
+		}
+	}
+
+	MustCheckContentAndWriteFileWithMkdir(path, content)
 }
 
 func AppendFile(path string, content []byte) (err error) {

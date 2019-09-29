@@ -1,11 +1,10 @@
 package udwTime
 
 import (
+	"github.com/tachyon-protocol/udw/udwStrconv"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/tachyon-protocol/udw/udwStrconv"
 )
 
 const (
