@@ -7,14 +7,17 @@ import (
 )
 
 func GetDefaultTimeZone() *time.Location {
-	return GetBeijingZone()
+	return GetUtc8Zone()
 }
 
-func GetBeijingZone() *time.Location {
-	gBeijingZoneOnce.Do(func() {
-		gBeijingZone = time.FixedZone("HKT", 8*60*60)
+var gUtc8Zone *time.Location
+var gUtc8ZoneOnce sync.Once
+
+func GetUtc8Zone() *time.Location {
+	gUtc8ZoneOnce.Do(func() {
+		gUtc8Zone = time.FixedZone("UTC8", 8*60*60)
 	})
-	return gBeijingZone
+	return gUtc8Zone
 }
 
 func GetPSTZone() *time.Location {
@@ -33,23 +36,6 @@ func GetUtc2Zone() *time.Location {
 
 func GetUtcD4Zone() *time.Location {
 	return time.FixedZone(`UTC-4`, -4*60*60)
-}
-
-var gBeijingZone *time.Location
-var gBeijingZoneOnce sync.Once
-
-func MustLoadZone(name string) (loc *time.Location) {
-	switch name {
-	case "CST", "Beijing":
-		return GetBeijingZone()
-	case "EST":
-		return GetESTZone()
-	case "PST":
-		return GetPSTZone()
-	default:
-		panic("time zone name [" + name + "]not found")
-	}
-
 }
 
 func FormatTimeZone(tz *time.Location) string {

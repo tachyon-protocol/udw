@@ -10,7 +10,7 @@ import (
 
 func Log(a ...interface{}) {
 	bufW := gBufWriterPool.Get()
-	outB := time.Now().In(udwTime.GetBeijingZone()).AppendFormat(bufW.GetBytes(), udwTime.FormatUdwLog)
+	outB := time.Now().In(udwTime.GetUtc8Zone()).AppendFormat(bufW.GetBytes(), udwTime.FormatUdwLog)
 	bufW.Write_(outB)
 	bufW.WriteByte_(' ')
 	_, _ = fmt.Fprintln(bufW, a...)

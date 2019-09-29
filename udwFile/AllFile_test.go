@@ -25,6 +25,7 @@ func TestGetFileModeTime(t *testing.T) {
 	MustDelete("zzzig_testFile")
 	defer MustDelete("zzzig_testFile")
 	startTime := time.Now()
+
 	MustWriteFileWithMkdir("zzzig_testFile/d1/d2/f3", []byte("1"))
 	endTime := time.Now()
 	modeTime, err := GetFileModifyTime("zzzig_testFile/d1/d2/f3")

@@ -11,7 +11,7 @@ func TestDbTime(ot *testing.T) {
 	var t time.Time
 	t = time.Date(2000, 1, 1, 1, 1, 1, 1, time.UTC)
 	udwTest.Equal(MustDbTimeGetStringFromObj(t), "2000-01-01T01:01:01.000000001")
-	t = time.Date(2000, 1, 1, 1, 1, 1, 1, GetBeijingZone())
+	t = time.Date(2000, 1, 1, 1, 1, 1, 1, GetUtc8Zone())
 	udwTest.Equal(MustDbTimeGetStringFromObj(t), "1999-12-31T17:01:01.000000001")
 	t = time.Date(2000, 1, 1, 1, 1, 1, 10, time.UTC)
 	udwTest.Equal(MustDbTimeGetStringFromObj(t), "2000-01-01T01:01:01.000000010")
