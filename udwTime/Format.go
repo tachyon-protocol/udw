@@ -208,7 +208,7 @@ func FormatDefaultRfc3339(t time.Time) string {
 }
 
 func FormatMysqlMinuteInTz(t time.Time, tz *time.Location) string {
-	t = t.In(time.Local)
+	t = t.In(tz)
 	s := t.Format(FormatMysqlMinute)
 	_, offset := t.Zone()
 	s += ` (UTC`
