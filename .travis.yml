@@ -1,7 +1,14 @@
-dist: xenial
 language: go
-go:
-  - 1.11.6
+matrix:
+  include:
+  - dist: xenial
+    go: "1.11.6"
+  - dist: xenial
+    go: "1.13.1"
+  - os: osx
+    go: "1.11.6"
+  - os: windows
+    go: "1.11.6"
 git:
   depth: 1
 notifications:
