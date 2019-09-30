@@ -10,6 +10,24 @@ func GetDefaultTimeZone() *time.Location {
 	return GetUtc8Zone()
 }
 
+func GetUtcD8Zone() *time.Location {
+	return time.FixedZone("UTC-8", -8*60*60)
+}
+
+func GetUtcD7Zone() *time.Location {
+	return time.FixedZone("UTC-7", -7*60*60)
+}
+
+func GetUtcD5Zone() *time.Location {
+	return time.FixedZone("UTC-5", -5*60*60)
+}
+func GetUtcD4Zone() *time.Location {
+	return time.FixedZone(`UTC-4`, -4*60*60)
+}
+func GetUtc2Zone() *time.Location {
+	return time.FixedZone("UTC2", 2*60*60)
+}
+
 var gUtc8Zone *time.Location
 var gUtc8ZoneOnce sync.Once
 
@@ -18,24 +36,6 @@ func GetUtc8Zone() *time.Location {
 		gUtc8Zone = time.FixedZone("UTC8", 8*60*60)
 	})
 	return gUtc8Zone
-}
-
-func GetPSTZone() *time.Location {
-	return time.FixedZone("PST", -8*60*60)
-}
-
-func GetESTZone() *time.Location {
-	return time.FixedZone("EST", -5*60*60)
-}
-func GetPDTZone() *time.Location {
-	return time.FixedZone("PDT", -7*60*60)
-}
-func GetUtc2Zone() *time.Location {
-	return time.FixedZone("UTC2", 2*60*60)
-}
-
-func GetUtcD4Zone() *time.Location {
-	return time.FixedZone(`UTC-4`, -4*60*60)
 }
 
 func FormatTimeZone(tz *time.Location) string {
