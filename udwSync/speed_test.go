@@ -58,7 +58,7 @@ func TestBenchBroadcastChannel(ot *testing.T) {
 }
 
 func TestBenchBroadcastChannel2(ot *testing.T) {
-	const num = 30000
+	const num = 300
 	var wgList []bool
 	broadcastChannel := make(chan struct{})
 	broadcastChannelLocker := sync.Mutex{}
