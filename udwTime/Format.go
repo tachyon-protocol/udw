@@ -101,7 +101,7 @@ func PstTimeZoneDateFormat(t time.Time) string {
 	if t.IsZero() {
 		return ""
 	}
-	return t.In(GetPSTZone()).Format(FormatDateMysql)
+	return t.In(GetUtcD8Zone()).Format(FormatDateMysql)
 }
 
 func MonthAndDayFormat(t time.Time) string {

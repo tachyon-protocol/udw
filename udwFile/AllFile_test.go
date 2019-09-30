@@ -25,14 +25,13 @@ func TestGetFileModeTime(t *testing.T) {
 	MustDelete("zzzig_testFile")
 	defer MustDelete("zzzig_testFile")
 	startTime := time.Now()
-
 	MustWriteFileWithMkdir("zzzig_testFile/d1/d2/f3", []byte("1"))
 	endTime := time.Now()
 	modeTime, err := GetFileModifyTime("zzzig_testFile/d1/d2/f3")
 	udwTest.Equal(err, nil)
 
-	udwTest.Ok(modeTime.Before(endTime), modeTime.String(), endTime.String())
-	udwTest.Ok(modeTime.After(startTime), modeTime.String(), startTime.String())
+	udwTest.Ok(modeTime.Before(endTime.Add(time.Second)), modeTime.String(), endTime.String())
+	udwTest.Ok(modeTime.After(startTime.Add(-time.Second)), modeTime.String(), startTime.String())
 }
 func TestMustGetAllDir(t *testing.T) {
 	MustDelete("zzzig_testFile")
