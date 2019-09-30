@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const testTimeTick = 50 * time.Millisecond
+
 func TestMemoryObjectPool(ot *testing.T) {
 	allocNum := 0
 	allocNumLocker := sync.Mutex{}
@@ -36,7 +38,7 @@ func TestMemoryObjectPool(ot *testing.T) {
 		wg.Add(1)
 		go func() {
 			pool.Go(func(obj interface{}) {
-				time.Sleep(time.Millisecond * 10)
+				time.Sleep(testTimeTick)
 				b := obj.([]byte)
 				udwTest.Equal(len(b), 1024*1024)
 				wg.Done()
@@ -46,6 +48,6 @@ func TestMemoryObjectPool(ot *testing.T) {
 	wg.Wait()
 	dur := time.Since(startTime)
 	udwTest.Equal(allocNum, 4)
-	udwTest.Ok(dur >= time.Millisecond*20)
-	udwTest.Ok(dur < time.Millisecond*40)
+	udwTest.Ok(dur >= testTimeTick*2, dur.String())
+	udwTest.Ok(dur < testTimeTick*4, dur.String())
 }

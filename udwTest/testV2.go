@@ -135,7 +135,7 @@ func AssertPanic(f func()) (out interface{}) {
 	panic(assertPanicType{})
 }
 
-func AssertPanicWithErrorMessage(f func(), errorMsg string) {
+func AssertPanicWithErrorMessage(f func(), errorMsgList ...string) {
 	outI := AssertPanic(f)
 	msg := ""
 	switch out := outI.(type) {
@@ -147,8 +147,15 @@ func AssertPanicWithErrorMessage(f func(), errorMsg string) {
 	default:
 		panic(fmt.Errorf("[AssertPanicWithErrorMessage] not expect panic type %T", outI))
 	}
-	if !strings.Contains(msg, errorMsg) {
-		panic(fmt.Errorf("[AssertPanicWithErrorMessage] panic:[%s] need:[%s]", msg, errorMsg))
+	hasFound := false
+	for _, errMsg := range errorMsgList {
+		if strings.Contains(msg, errMsg) {
+			hasFound = true
+			break
+		}
+	}
+	if hasFound == false {
+		panic("[AssertPanicWithErrorMessage] panic:[" + msg + "] need:[" + strings.Join(errorMsgList, ", ") + "]")
 	}
 }
 
