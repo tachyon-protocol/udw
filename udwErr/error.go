@@ -1,13 +1,12 @@
 package udwErr
 
 import (
-	"fmt"
-	"runtime/debug"
-
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/tachyon-protocol/udw/udwStrconv"
 	"runtime"
+	"runtime/debug"
 	"strconv"
 )
 

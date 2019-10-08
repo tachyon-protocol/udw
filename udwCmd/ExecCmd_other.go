@@ -1,3 +1,5 @@
+// +build  !windows
+
 package udwCmd
 
 import "os/exec"

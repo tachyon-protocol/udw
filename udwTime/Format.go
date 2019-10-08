@@ -1,11 +1,10 @@
 package udwTime
 
 import (
+	"github.com/tachyon-protocol/udw/udwStrconv"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/tachyon-protocol/udw/udwStrconv"
 )
 
 const (
@@ -102,7 +101,7 @@ func PstTimeZoneDateFormat(t time.Time) string {
 	if t.IsZero() {
 		return ""
 	}
-	return t.In(GetPSTZone()).Format(FormatDateMysql)
+	return t.In(GetUtcD8Zone()).Format(FormatDateMysql)
 }
 
 func MonthAndDayFormat(t time.Time) string {
@@ -209,7 +208,7 @@ func FormatDefaultRfc3339(t time.Time) string {
 }
 
 func FormatMysqlMinuteInTz(t time.Time, tz *time.Location) string {
-	t = t.In(time.Local)
+	t = t.In(tz)
 	s := t.Format(FormatMysqlMinute)
 	_, offset := t.Zone()
 	s += ` (UTC`

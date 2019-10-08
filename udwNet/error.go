@@ -2,7 +2,6 @@ package udwNet
 
 import (
 	"errors"
-
 	"github.com/tachyon-protocol/udw/udwErr"
 	"strings"
 )

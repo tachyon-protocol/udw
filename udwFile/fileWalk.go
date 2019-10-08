@@ -1,7 +1,6 @@
 package udwFile
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -56,7 +55,7 @@ func MustFileWalk(root string, fn func(ctx *WalkContext)) {
 		case 2:
 			return filepath.SkipDir
 		default:
-			panic(fmt.Errorf("[MustAllFileAndDirectoryWalk] unexpected ctx.nextAction"))
+			panic("[MustAllFileAndDirectoryWalk] unexpected ctx.nextAction")
 		}
 	})
 	if err != nil && err != io.EOF {

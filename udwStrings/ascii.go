@@ -10,6 +10,15 @@ func AsciiToLower(str string) string {
 	return string(bs)
 }
 
+func AsciiToLowerByteListInPlace(str []byte) {
+	for i, b := range str {
+		if 'A' <= b && b <= 'Z' {
+			str[i] += 'a' - 'A'
+		}
+	}
+	return
+}
+
 func IsAllAscii(s string) bool {
 	if s == "" {
 		return false

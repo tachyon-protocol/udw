@@ -3,9 +3,8 @@ package udwTime
 import (
 	"fmt"
 	"github.com/tachyon-protocol/udw/udwStrconv"
-	"time"
-
 	"strings"
+	"time"
 )
 
 func DurationFormatTimeMysql(dur time.Duration) string {
