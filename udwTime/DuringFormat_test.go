@@ -7,17 +7,17 @@ import (
 )
 
 func TestDurationFormat(ot *testing.T) {
-	udwTest.Equal(DurationFormat(time.Second), "1.00s")
-	udwTest.Equal(DurationFormat(1000*time.Second), "16.67min")
-	udwTest.Equal(DurationFormat(12345*time.Millisecond), "12.35s")
-	udwTest.Equal(DurationFormat(1234*time.Microsecond), "1.23ms")
-	udwTest.Equal(DurationFormat(1234*time.Nanosecond), "1.23µs")
-	udwTest.Equal(DurationFormat(Day), "1.00day")
-	udwTest.Equal(DurationFormat(time.Hour), "1.00h")
-	udwTest.Equal(DurationFormat(Day*30), "30.00day")
-	udwTest.Equal(DurationFormat(Day*400), "1.10year")
-	udwTest.Equal(DurationFormatPadding(1234*time.Nanosecond), "    1.23µs")
-	udwTest.Equal(DurationFormatPadding(1234*time.Millisecond), "     1.23s")
+	udwTest.Equal(DurationFormat(time.Second), "1.0000s")
+	udwTest.Equal(DurationFormat(1000*time.Second), "16.667m")
+	udwTest.Equal(DurationFormat(12345*time.Millisecond), "12.345s")
+	udwTest.Equal(DurationFormat(1234*time.Microsecond), "1.234ms")
+	udwTest.Equal(DurationFormat(1234*time.Nanosecond), "1.234us")
+	udwTest.Equal(DurationFormat(Day), "1.0000d")
+	udwTest.Equal(DurationFormat(time.Hour), "1.0000h")
+	udwTest.Equal(DurationFormat(Day*30), "30.000d")
+	udwTest.Equal(DurationFormat(Day*400), "1.0959y")
+	udwTest.Equal(DurationFormatPadding(1234*time.Nanosecond), "1.234us")
+	udwTest.Equal(DurationFormatPadding(1234*time.Millisecond), "1.2340s")
 }
 
 func TestDurationFormatTimeMysql(t *testing.T) {

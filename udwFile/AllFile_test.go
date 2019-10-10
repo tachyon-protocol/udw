@@ -49,9 +49,9 @@ func TestMustGetAllDir(t *testing.T) {
 	}
 	udwTest.EqualStringListNoOrder(shouldExistPathList, dirs)
 
-	udwTest.AssertPanicWithErrorMessage(func() {
+	testAsertFileNotExist(func() {
 		MustGetAllDir("zzzig_testFileNotExist")
-	}, "no such file or directory")
+	})
 }
 
 func TestMustGetAllFileOneLevel(t *testing.T) {
@@ -69,9 +69,9 @@ func TestMustGetAllFileOneLevel(t *testing.T) {
 	}
 	udwTest.EqualStringListNoOrder(shouldExistPathList, fileOneLevelList)
 
-	udwTest.AssertPanicWithErrorMessage(func() {
+	testAsertFileNotExist(func() {
 		MustGetAllFileOneLevel("zzzig_testFileNotExist")
-	}, "no such file or directory")
+	})
 }
 
 func TestMustGetAllFiles(t *testing.T) {
@@ -98,4 +98,8 @@ func TestMustGetAllFiles(t *testing.T) {
 	fileList := MustGetAllFiles("zzzig_testFileNotExist")
 	udwTest.Equal(fileList, nil)
 
+}
+
+func testAsertFileNotExist(cb func()) {
+	udwTest.AssertPanicWithErrorMessage(cb, "no such file or directory", "The system cannot find the file specified")
 }

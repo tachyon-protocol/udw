@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/tachyon-protocol/udw/udwFileFastWalk"
+	"github.com/tachyon-protocol/udw/udwFile/udwFileFastWalk"
 	"io/ioutil"
 	"os"
 	"path/filepath"

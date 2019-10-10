@@ -4,7 +4,7 @@ package udwNet
 
 import (
 	"bytes"
-	"github.com/tachyon-protocol/udw/udwNetWindowsSyscall"
+	"github.com/tachyon-protocol/udw/udwNet/udwNetWindowsSyscall"
 	"net"
 	"os"
 	"syscall"

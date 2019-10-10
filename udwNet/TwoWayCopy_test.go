@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/tachyon-protocol/udw/udwErr"
 	"github.com/tachyon-protocol/udw/udwNet"
-	"github.com/tachyon-protocol/udw/udwNetTestV2"
+	"github.com/tachyon-protocol/udw/udwNet/udwNetTestV2"
 	"github.com/tachyon-protocol/udw/udwTest"
 	"io"
 	"net"

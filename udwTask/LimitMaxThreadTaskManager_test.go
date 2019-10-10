@@ -8,7 +8,8 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	const tick = time.Millisecond * 30
+
+	const tick = time.Millisecond * 50
 	{
 		startTime := time.Now()
 		tasker := New(1)
@@ -17,11 +18,13 @@ func TestNew(t *testing.T) {
 			time.Sleep(tick)
 			runNumber.Add(1)
 		})
-		udwTest.Ok(time.Since(startTime) < tick)
+		dur := time.Since(startTime)
+		udwTest.Ok(dur < tick, dur.String())
 		tasker.Close()
 		udwTest.Equal(runNumber.Get(), 1)
-		udwTest.Ok(time.Since(startTime) > tick)
-		udwTest.Ok(time.Since(startTime) < tick*2)
+		dur = time.Since(startTime)
+		udwTest.Ok(dur > tick, dur.String())
+		udwTest.Ok(dur < tick*2, dur.String())
 	}
 	{
 		startTime := time.Now()

@@ -3,7 +3,7 @@ package udwFileFastWalk_test
 import (
 	"github.com/tachyon-protocol/udw/udwErr"
 	"github.com/tachyon-protocol/udw/udwFile"
-	"github.com/tachyon-protocol/udw/udwFileFastWalk"
+	"github.com/tachyon-protocol/udw/udwFile/udwFileFastWalk"
 	"github.com/tachyon-protocol/udw/udwTest"
 	"path/filepath"
 	"testing"

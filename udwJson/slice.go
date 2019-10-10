@@ -3,7 +3,7 @@ package udwJson
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/tachyon-protocol/udw/udwJsonLib"
+	"github.com/tachyon-protocol/udw/udwJson/udwJsonLib"
 	"github.com/tachyon-protocol/udw/udwStrings"
 	"reflect"
 )

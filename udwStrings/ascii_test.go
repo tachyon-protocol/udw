@@ -1,7 +1,6 @@
 package udwStrings
 
 import (
-	"fmt"
 	"github.com/tachyon-protocol/udw/udwTest"
 	"testing"
 )
@@ -13,7 +12,7 @@ func TestAsciiToLower(t *testing.T) {
 		"�":                  "�",
 		string([]byte{0x89}): string([]byte{0x89}),
 	} {
-		fmt.Println([]byte(input), []byte(AsciiToLower(input)))
+
 		udwTest.Ok(AsciiToLower(input) == expect)
 	}
 }

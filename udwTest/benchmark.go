@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"runtime"
-	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -63,16 +63,18 @@ func BenchmarkWithThread(threadNum int, perThreadNumber int, fn func()) {
 }
 
 type benchmarkCtx struct {
-	num          int
-	sizePerRun   int
-	dur          time.Duration
-	name         string
-	allocNum     uint64
-	allocSize    uint64
-	runLocker    sync.Mutex
-	dataLocker   sync.Mutex
-	startCgoCall int64
-	endCgoCall   int64
+	num             int
+	sizePerRun      int
+	dur             time.Duration
+	name            string
+	namePadding     int
+	allocNum        uint64
+	allocSize       uint64
+	runLocker       sync.Mutex
+	dataLocker      sync.Mutex
+	startCgoCall    int64
+	endCgoCall      int64
+	namePaddingSize int
 }
 
 var gBenchmarkCtx benchmarkCtx
@@ -95,11 +97,23 @@ func BenchmarkSetName(name string) {
 	gBenchmarkCtx.dataLocker.Unlock()
 }
 
+func BenchmarkSetNamePadding(namePadding int) {
+	gBenchmarkCtx.dataLocker.Lock()
+	gBenchmarkCtx.namePadding = namePadding
+	gBenchmarkCtx.dataLocker.Unlock()
+}
+
 func benchmarkResultString__NOLOCK() string {
 	buf := bytes.Buffer{}
 	buf.WriteString("Benchmark ")
 	if gBenchmarkCtx.name != "" {
 		buf.WriteString(gBenchmarkCtx.name)
+		if gBenchmarkCtx.namePadding <= 1 {
+			gBenchmarkCtx.namePadding = 8
+		}
+		if len(gBenchmarkCtx.name) <= gBenchmarkCtx.namePadding-1 {
+			buf.WriteString(strings.Repeat(" ", gBenchmarkCtx.namePadding-1-len(gBenchmarkCtx.name)))
+		}
 		buf.WriteString(" ")
 	}
 	buf.WriteString("[")
@@ -111,7 +125,7 @@ func benchmarkResultString__NOLOCK() string {
 	buf.WriteString("op/s] ")
 
 	buf.WriteString("duration:[")
-	buf.WriteString(gBenchmarkCtx.dur.String())
+	buf.WriteString(durationFormatFloat64Ns(float64(gBenchmarkCtx.dur)))
 	buf.WriteString("] ")
 
 	buf.WriteString("allocNum:[")
@@ -133,47 +147,4 @@ func benchmarkResultString__NOLOCK() string {
 		buf.WriteString("/op] ")
 	}
 	return buf.String()
-}
-
-func durationFormatFloat64Ns(ns float64) string {
-	if ns < 0 {
-		panic(ns)
-	}
-	if ns > 1e3 {
-		return time.Duration(ns).String()
-	}
-	if ns > 1 {
-		return fmt.Sprintf("%.2fns", ns)
-	}
-	if ns > 0.1 {
-		return fmt.Sprintf("%.3fns", ns)
-	}
-	return fmt.Sprintf("%fns", ns)
-}
-
-func gbFromFloat64(byteNum float64) string {
-	if byteNum >= 1e15 || byteNum <= -1e15 {
-		return formatFloat64ToFInLen(byteNum/(1024*1024*1024*1024*1024), 6) + "PB"
-	}
-	if byteNum >= 1e12 || byteNum <= -1e12 {
-		return formatFloat64ToFInLen(byteNum/(1024*1024*1024*1024), 6) + "TB"
-	}
-	if byteNum >= 1e9 || byteNum <= -1e9 {
-		return formatFloat64ToFInLen(byteNum/(1024*1024*1024), 6) + "GB"
-	}
-	if byteNum >= 1e6 || byteNum <= -1e6 {
-		return formatFloat64ToFInLen(byteNum/(1024*1024), 6) + "MB"
-	}
-	if byteNum >= 1e3 || byteNum <= -1e3 {
-		return formatFloat64ToFInLen(byteNum/(1024), 6) + "KB"
-	}
-	return formatFloat64ToFInLen(byteNum, 7) + "B"
-}
-
-func formatFloat64ToFInLen(f float64, showLen int) string {
-	s1 := strconv.FormatFloat(f, 'f', 0, 64)
-	if len(s1)+1 >= showLen {
-		return s1
-	}
-	return strconv.FormatFloat(f, 'f', showLen-len(s1)-1, 64)
 }

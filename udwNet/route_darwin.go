@@ -4,7 +4,6 @@ package udwNet
 
 import (
 	"encoding/binary"
-	"encoding/hex"
 	"fmt"
 	"github.com/tachyon-protocol/udw/udwErr"
 	"github.com/tachyon-protocol/udw/udwLog"
@@ -203,7 +202,9 @@ func parseSyscallOneRouteRow(thisPart []byte, interfaceIndexMap map[int]*NetDevi
 		thisRule.gatewayIp = gateway
 		return thisRule
 	}
-	panic(fmt.Errorf("[parseSyscallOneRouteRow] unsolve sa %s", hex.Dump(thisPart[0x5c:])))
+
+	udwLog.Log("[7nf6sfk4sn] WARNING")
+	return nil
 
 }
 
