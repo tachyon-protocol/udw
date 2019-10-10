@@ -1,7 +1,7 @@
 package udwRandNewId_test
 
 import (
-	"github.com/tachyon-protocol/udw/udwRandNewId"
+	"github.com/tachyon-protocol/udw/udwRand/udwRandNewId"
 	"github.com/tachyon-protocol/udw/udwTask"
 	"github.com/tachyon-protocol/udw/udwTest"
 	"sync"

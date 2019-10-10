@@ -3,7 +3,7 @@ package udwNet
 import (
 	"fmt"
 	"github.com/tachyon-protocol/udw/udwIo"
-	"github.com/tachyon-protocol/udw/udwRandNewId"
+	"github.com/tachyon-protocol/udw/udwRand/udwRandNewId"
 	"io"
 	"net"
 )

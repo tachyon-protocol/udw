@@ -8,27 +8,27 @@ import (
 )
 
 func TestGbFromFloat64(t *testing.T) {
-	udwTest.Equal(udwStrconv.GbFromFloat64(0.5), "0.50000B")
-	udwTest.Equal(udwStrconv.GbFromFloat64(158.33333333333334), "158.333B")
-	udwTest.Equal(udwStrconv.GbFromFloat64(1), "1.00000B")
-	udwTest.Equal(udwStrconv.GbFromFloat64(999), "999.000B")
-	udwTest.Equal(udwStrconv.GbFromFloat64(1000), "0.9766KB")
-	udwTest.Equal(udwStrconv.GbFromFloat64(1001), "0.9775KB")
-	udwTest.Equal(udwStrconv.GbFromFloat64(1024), "1.0000KB")
-	udwTest.Equal(udwStrconv.GbFromFloat64(1000*1000-1), "976.56KB")
-	udwTest.Equal(udwStrconv.GbFromFloat64(1000*1000), "0.9537MB")
-	udwTest.Equal(udwStrconv.GbFromFloat64(1000*1000+1), "0.9537MB")
-	udwTest.Equal(udwStrconv.GbFromFloat64(1024*1024), "1.0000MB")
-	udwTest.Equal(udwStrconv.GbFromFloat64(1024*1024*1024), "1.0000GB")
-	udwTest.Equal(udwStrconv.GbFromFloat64(1024*1024*1024*1024), "1.0000TB")
-	udwTest.Equal(udwStrconv.GbFromFloat64(1024*1024*1024*1024*1024), "1.0000PB")
+	udwTest.Equal(udwStrconv.GbFromFloat64(0.5), "0.5000B")
+	udwTest.Equal(udwStrconv.GbFromFloat64(158.33333333333334), "158.33B")
+	udwTest.Equal(udwStrconv.GbFromFloat64(1), "1.0000B")
+	udwTest.Equal(udwStrconv.GbFromFloat64(999), "999.00B")
+	udwTest.Equal(udwStrconv.GbFromFloat64(1000), "0.977KB")
+	udwTest.Equal(udwStrconv.GbFromFloat64(1001), "0.978KB")
+	udwTest.Equal(udwStrconv.GbFromFloat64(1024), "1.000KB")
+	udwTest.Equal(udwStrconv.GbFromFloat64(1000*1000-1), "976.6KB")
+	udwTest.Equal(udwStrconv.GbFromFloat64(1000*1000), "0.954MB")
+	udwTest.Equal(udwStrconv.GbFromFloat64(1000*1000+1), "0.954MB")
+	udwTest.Equal(udwStrconv.GbFromFloat64(1024*1024), "1.000MB")
+	udwTest.Equal(udwStrconv.GbFromFloat64(1024*1024*1024), "1.000GB")
+	udwTest.Equal(udwStrconv.GbFromFloat64(1024*1024*1024*1024), "1.000TB")
+	udwTest.Equal(udwStrconv.GbFromFloat64(1024*1024*1024*1024*1024), "1.000PB")
 }
 
 func TestGbPaddingFromInt64(t *testing.T) {
-	udwTest.Equal(udwStrconv.GbPaddingFromInt64(1), "1.00000B")
-	udwTest.Equal(udwStrconv.GbPaddingFromInt64(1000*1024), "0.9766MB")
-	udwTest.Equal(udwStrconv.GbPaddingFromInt64(1000*1000-1), "976.56KB")
-	udwTest.Equal(udwStrconv.GbPaddingFromInt64(1000*1000), "0.9537MB")
+	udwTest.Equal(udwStrconv.GbPaddingFromInt64(1), "1.0000B")
+	udwTest.Equal(udwStrconv.GbPaddingFromInt64(1000*1024), "0.977MB")
+	udwTest.Equal(udwStrconv.GbPaddingFromInt64(1000*1000-1), "976.6KB")
+	udwTest.Equal(udwStrconv.GbPaddingFromInt64(1000*1000), "0.954MB")
 }
 
 func TestGbStringToFloat64(t *testing.T) {

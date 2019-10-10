@@ -1,7 +1,7 @@
 package udwJsonLib_test
 
 import (
-	"github.com/tachyon-protocol/udw/udwJsonLib"
+	"github.com/tachyon-protocol/udw/udwJson/udwJsonLib"
 	"github.com/tachyon-protocol/udw/udwTest"
 	"github.com/tachyon-protocol/udw/udwTime"
 	"testing"

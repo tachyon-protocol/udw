@@ -1,7 +1,7 @@
 package udwFile
 
 import (
-	"github.com/tachyon-protocol/udw/udwFileFastWalk"
+	"github.com/tachyon-protocol/udw/udwFile/udwFileFastWalk"
 	"github.com/tachyon-protocol/udw/udwSort"
 	"io/ioutil"
 	"os"

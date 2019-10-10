@@ -13,29 +13,26 @@ const MB = 1024 * 1024
 const KB = 1024
 
 func GbPaddingFromFloat64(byteNum float64) string {
-	s := GbFromFloat64(byteNum)
-	if len(s) < 8 {
-		s = strings.Repeat(" ", 8-len(s)) + s
-	}
-	return s
+
+	return GbFromFloat64(byteNum)
 }
 func GbFromFloat64(byteNum float64) string {
 	if byteNum >= 1e15 || byteNum <= -1e15 {
-		return FormatFloat64ToFInLen(byteNum/(1024*1024*1024*1024*1024), 6) + "PB"
+		return FormatFloat64ToFInLen(byteNum/(1024*1024*1024*1024*1024), 5) + "PB"
 	}
 	if byteNum >= 1e12 || byteNum <= -1e12 {
-		return FormatFloat64ToFInLen(byteNum/(1024*1024*1024*1024), 6) + "TB"
+		return FormatFloat64ToFInLen(byteNum/(1024*1024*1024*1024), 5) + "TB"
 	}
 	if byteNum >= 1e9 || byteNum <= -1e9 {
-		return FormatFloat64ToFInLen(byteNum/(1024*1024*1024), 6) + "GB"
+		return FormatFloat64ToFInLen(byteNum/(1024*1024*1024), 5) + "GB"
 	}
 	if byteNum >= 1e6 || byteNum <= -1e6 {
-		return FormatFloat64ToFInLen(byteNum/(1024*1024), 6) + "MB"
+		return FormatFloat64ToFInLen(byteNum/(1024*1024), 5) + "MB"
 	}
 	if byteNum >= 1e3 || byteNum <= -1e3 {
-		return FormatFloat64ToFInLen(byteNum/(1024), 6) + "KB"
+		return FormatFloat64ToFInLen(byteNum/(1024), 5) + "KB"
 	}
-	return FormatFloat64ToFInLen(byteNum, 7) + "B"
+	return FormatFloat64ToFInLen(byteNum, 6) + "B"
 }
 
 func GbFromFloat64WithUnit(byteNum float64) (string, string) {

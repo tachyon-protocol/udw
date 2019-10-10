@@ -3,7 +3,6 @@ package udwTime
 import (
 	"fmt"
 	"github.com/tachyon-protocol/udw/udwStrconv"
-	"strings"
 	"time"
 )
 
@@ -28,16 +27,7 @@ func DurationFormat(dur time.Duration) string {
 }
 
 func DurationFormatPadding(dur time.Duration) string {
-	s := DurationFormatFloat64Ns(float64(dur))
-	if len(s) < 10 {
-		fixToSize := 10
-		if strings.Contains(s, "µ") {
-
-			fixToSize += 1
-		}
-		s = strings.Repeat(" ", fixToSize-len(s)) + s
-	}
-	return s
+	return DurationFormatFloat64Ns(float64(dur))
 }
 
 func DurationFormatFloat64Seconds(dur float64) string {
@@ -45,22 +35,24 @@ func DurationFormatFloat64Seconds(dur float64) string {
 }
 
 func DurationFormatFloat64Ns(dur float64) string {
-	if (dur >= float64(365*Day)) || (dur <= float64(-365*Day)) {
-		return udwStrconv.FormatFloatPrec2(float64(dur)/float64(365*Day)) + "year"
-	} else if dur >= float64(Day) || dur <= float64(-Day) {
-		return udwStrconv.FormatFloatPrec2(float64(dur)/float64(Day)) + "day"
+	const day = 24 * time.Hour
+	const year = 365 * day
+	if (dur >= float64(year)) || (dur <= float64(-year)) {
+		return udwStrconv.FormatFloat64ToFInLen(float64(dur)/float64(year), 6) + "y"
+	} else if dur >= float64(day) || dur <= float64(-day) {
+		return udwStrconv.FormatFloat64ToFInLen(float64(dur)/float64(day), 6) + "d"
 	} else if dur >= float64(time.Hour) || dur < float64(-time.Hour) {
-		return udwStrconv.FormatFloatPrec2(float64(dur)/float64(time.Hour)) + "h"
+		return udwStrconv.FormatFloat64ToFInLen(float64(dur)/float64(time.Hour), 6) + "h"
 	} else if dur >= float64(time.Minute) || dur <= float64(-time.Minute) {
-		return udwStrconv.FormatFloatPrec2(float64(dur)/float64(time.Minute)) + "min"
+		return udwStrconv.FormatFloat64ToFInLen(float64(dur)/float64(time.Minute), 6) + "m"
 	} else if dur >= float64(time.Second) || dur <= float64(-time.Second) {
-		return udwStrconv.FormatFloatPrec2(float64(dur)/float64(time.Second)) + "s"
+		return udwStrconv.FormatFloat64ToFInLen(float64(dur)/float64(time.Second), 6) + "s"
 	} else if dur >= float64(time.Millisecond) || dur <= float64(-time.Millisecond) {
-		return udwStrconv.FormatFloatPrec2(float64(dur)/float64(time.Millisecond)) + "ms"
+		return udwStrconv.FormatFloat64ToFInLen(float64(dur)/float64(time.Millisecond), 5) + "ms"
 	} else if dur >= float64(time.Microsecond) || dur <= float64(-time.Microsecond) {
-		return udwStrconv.FormatFloatPrec2(float64(dur)/float64(time.Microsecond)) + "µs"
+		return udwStrconv.FormatFloat64ToFInLen(float64(dur)/float64(time.Microsecond), 5) + "us"
 	} else {
-		return udwStrconv.FormatFloatPrec2(dur) + "ns"
+		return udwStrconv.FormatFloat64ToFInLen(dur, 5) + "ns"
 	}
 }
 

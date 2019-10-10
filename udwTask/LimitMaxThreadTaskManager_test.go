@@ -8,6 +8,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
+
 	const tick = time.Millisecond * 50
 	{
 		startTime := time.Now()
