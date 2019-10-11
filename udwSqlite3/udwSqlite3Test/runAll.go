@@ -1,0 +1,36 @@
+package udwSqlite3Test
+
+func RunAllTest() {
+	
+
+	testZeroBug()
+	TestSpeedMemory()
+	testInt()
+	testMustUpdate()
+	TestProcessList()
+	testSimpleQuery()
+	testSimpleQueryAffectedRows()
+	testQueryReturnOrder()
+	TestMustTableCopy()
+	TestEncrypt()
+	TestThread()
+	TestInitDatabaseCorrupt()
+	TestInitDatabaseCorrupt2()
+	TestInitDatabaseCorrupt3()
+	TestMustGetRange()
+	TestSpeedSingleSetGet()
+	TestThreadSafe()
+	TestMustGetAllK1()
+	TestVersion()
+	TestMustGetRangeValueListCallback()
+	TestNoSql()
+	TestInsert()
+	TestSet()
+	TestMustInsertAndReturnExist()
+	TestMustMulitDelete()
+	TestJson()
+	testMulitGet()
+	testGetAllDataInTableToRowMap()
+	testThreadSafe2()
+	testMemoryDb()
+}
