@@ -6,7 +6,7 @@ import (
 )
 
 func TestMustLookupDomainInAddrString(ot *testing.T) {
-	out := MustLookupDomainInAddrString("www.baidu.com:80")
+	out := MustLookupDomainInAddrString("www.apple.com:80")
 	ip, port := MustSplitIpPort(out)
 	udwTest.Equal(port, uint16(80))
 	udwTest.Ok(ip != nil)

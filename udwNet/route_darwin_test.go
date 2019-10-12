@@ -39,7 +39,7 @@ func TestEncodeRouteAddMsg(ot *testing.T) {
 		0x10,
 		0x02,
 		0x00, 0x00,
-		0x72, 0x72, 0x72, 0x72,
+		0x08, 0x08, 0x08, 0x08,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 
 		0x10,
@@ -54,7 +54,7 @@ func TestEncodeRouteAddMsg(ot *testing.T) {
 		0xff, 0xff, 0xff, 0xff,
 	}
 
-	_, ipnet, err := net.ParseCIDR("114.114.114.114/32")
+	_, ipnet, err := net.ParseCIDR("8.8.8.8/32")
 	udwTest.Equal(err, nil)
 	contentB := encodeRouteAddMsg(*ipnet, net.ParseIP("172.21.0.1"))
 	udwTest.Equal(expectByte, contentB)
