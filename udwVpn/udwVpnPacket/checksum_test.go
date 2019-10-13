@@ -393,7 +393,7 @@ func TestBenchTcpCheckSum(ot *testing.T) {
 
 	debug.FreeOSMemory()
 
-	const benchNum = 1e8
+	const benchNum = 1e5
 	udwTest.Benchmark(func() {
 		udwTest.BenchmarkSetNum(benchNum)
 		udwTest.BenchmarkSetBytePerRun(len(b))

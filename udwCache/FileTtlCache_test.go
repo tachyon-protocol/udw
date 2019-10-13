@@ -25,16 +25,6 @@ func TestFileTtlCache(t *testing.T) {
 	udwTest.Equal(b, []byte("1"))
 	udwTest.Equal(err, nil)
 
-	b, err = FileTtlCache("test_file_ttl_cache", func() (b []byte, ttl time.Duration, err error) {
-		return []byte("2"), time.Millisecond, nil
-	})
-	udwTest.Equal(b, []byte("1"))
-	udwTest.Equal(err, nil)
+	return
 
-	time.Sleep(time.Millisecond)
-	b, err = FileTtlCache("test_file_ttl_cache", func() (b []byte, ttl time.Duration, err error) {
-		return []byte("2"), time.Millisecond, nil
-	})
-	udwTest.Equal(b, []byte("2"))
-	udwTest.Equal(err, nil)
 }
