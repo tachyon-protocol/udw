@@ -14,6 +14,8 @@ func TestDurationFormat(ot *testing.T) {
 	udwTest.Equal(DurationFormat(1234*time.Nanosecond), "1.234us")
 	udwTest.Equal(DurationFormat(Day), "1.0000d")
 	udwTest.Equal(DurationFormat(time.Hour), "1.0000h")
+	udwTest.Equal(DurationFormat(time.Duration(10.408*float64(time.Hour))), "10.408h")
+	udwTest.Equal(DurationFormat(time.Duration(9.832*float64(time.Hour))), "9.8320h")
 	udwTest.Equal(DurationFormat(Day*30), "30.000d")
 	udwTest.Equal(DurationFormat(Day*400), "1.0959y")
 	udwTest.Equal(DurationFormatPadding(1234*time.Nanosecond), "1.234us")
