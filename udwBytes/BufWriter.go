@@ -190,6 +190,9 @@ func (w *BufWriter) GetPos() int {
 func (w *BufWriter) GetLen() int {
 	return len(w.buf)
 }
+func (w *BufWriter) GetCap() int {
+	return cap(w.buf)
+}
 
 func (w *BufWriter) GetAllocNoUseBuf() []byte {
 	return w.buf[len(w.buf):cap(w.buf)]

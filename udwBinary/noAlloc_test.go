@@ -57,7 +57,7 @@ func TestWriteByteSliceWithUint32LenNoAlloc(t *testing.T) {
 	udwTest.Equal(err, nil)
 	udwTest.Equal(buf.Bytes(), resultContent)
 
-	const num = 1e8
+	const num = 1e3
 
 	udwTest.Benchmark(func() {
 		udwTest.BenchmarkSetNum(num)

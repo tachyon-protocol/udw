@@ -30,7 +30,10 @@ func NewId() (outS string) {
 	outS = udwRand.EncodeReadableAlphaNumForRandNoAlloc(entry2.buf[:48], entry2.buf[48:72])
 	gNewIdObjectPoolEntryLocker.Unlock()
 	return outS
+}
 
+func NewIdLen10() (outS string) {
+	return NewId()[:10]
 }
 
 func NewIdLikeUuid() string {
