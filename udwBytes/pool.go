@@ -24,9 +24,11 @@ func (pool *BufWriterPool) Get() *BufWriter {
 }
 
 func (pool *BufWriterPool) Put(w *BufWriter) {
-	if w != nil {
-		pool.pool.Put(w)
+	if w == nil {
+		return
 	}
+
+	pool.pool.Put(w)
 }
 
 func (pool *BufWriterPool) GetAndCloneFromByteSlice(buf []byte) *BufWriter {

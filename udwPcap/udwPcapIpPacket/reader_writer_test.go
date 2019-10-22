@@ -8,7 +8,7 @@ import (
 )
 
 func TestReader(ot *testing.T) {
-	inItem := Item{T: time.Now(), IpPacket: []byte{0x45, 0x0,
+	inItem := Item{T: time.Now().Truncate(time.Microsecond), IpPacket: []byte{0x45, 0x0,
 		0x0, 0x3b,
 		0xc3, 0xb8,
 		0x0, 0x0,
@@ -29,7 +29,7 @@ func TestReader(ot *testing.T) {
 		inItem, inItem})
 	num := 0
 	errMsg := ReadPcapToIpPacket(_buf.GetBytes(), func(item Item) {
-		udwTest.Ok(item.T.Equal(inItem.T))
+		udwTest.Ok(item.T.Equal(inItem.T), item.T, inItem.T)
 		num++
 	})
 	udwTest.Equal(errMsg, "")
