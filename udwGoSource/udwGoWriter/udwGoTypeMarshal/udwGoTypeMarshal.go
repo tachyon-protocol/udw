@@ -451,7 +451,7 @@ func IsObjHasInitAlloc(val reflect.Value, typ reflect.Type) bool {
 		return IsObjHasInitAlloc(val.Elem(), typ.Elem())
 	case reflect.String,
 		reflect.Uint8, reflect.Uint, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
-		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Bool:
+		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Bool, reflect.Float64, reflect.Float32:
 		return false
 	case reflect.Struct:
 		if typ.PkgPath() == "time" && typ.Name() == "Time" {
@@ -502,7 +502,7 @@ func IsReflectTypeHasInitAlloc(typ reflect.Type) bool {
 		return IsReflectTypeHasInitAlloc(typ.Elem())
 	case reflect.String,
 		reflect.Uint8, reflect.Uint, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
-		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Bool:
+		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Bool, reflect.Float64, reflect.Float32:
 		return false
 	case reflect.Struct:
 		if typ.PkgPath() == "time" && typ.Name() == "Time" {
