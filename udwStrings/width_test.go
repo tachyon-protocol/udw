@@ -11,7 +11,7 @@ func TestGetWidth(t *testing.T) {
 		output int
 	}{
 		{
-			input:  "魑魅魍魉",
+			input:  "中文中文",
 			output: 2 * 4,
 		},
 		{
