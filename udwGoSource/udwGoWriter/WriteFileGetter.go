@@ -12,8 +12,9 @@ type WriteGoFileGetterRequest struct {
 	FunctionName string
 	Obj          interface{}
 
-	GoFilePath string
-	BuildFlag  string
+	GoFilePath                  string
+	BuildFlag                   string
+	ObjTypeByteSliceHexEncoding bool
 }
 
 func WriteGoFileGetterWithGlobalVariable(req WriteGoFileGetterRequest) {
@@ -50,7 +51,17 @@ func ` + req.FunctionName + `() ` + typStr + `{
 `)
 	} else {
 		goFile.Buf.WriteString(`var g` + req.FunctionName + ` ` + typStr + ` = `)
-		goFile.MustWriteObjectToBuf(req.Obj, &goFile.Buf)
+		hasWrite := false
+		if req.ObjTypeByteSliceHexEncoding {
+			v, ok := req.Obj.([]byte)
+			if ok {
+				goFile.Buf.WriteString(udwGoTypeMarshal.WriteByteSlice(v))
+				hasWrite = true
+			}
+		}
+		if hasWrite == false {
+			goFile.MustWriteObjectToBuf(req.Obj, &goFile.Buf)
+		}
 		goFile.Buf.WriteString(`
 func ` + req.FunctionName + `() ` + typStr + `{
 	return g` + req.FunctionName + `
