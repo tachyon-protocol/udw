@@ -24,7 +24,7 @@ func TestBcVersion() {
 
 func TestBcEncrypt() {
 	testPath := "/tmp/test_sqlite3.db.encrypt"
-	udwSqlite3.DeleteSqliteDbFileByPath(testPath)
+	udwSqlite3.MustDeleteSqliteDbFileByPath(testPath)
 	udwFile.MustWriteFileWithMkdir(testPath, getBcDbEncrypt())
 	defer udwFile.MustDelete(testPath)
 	db1 := udwSqlite3.MustNewDb(udwSqlite3.NewDbRequest{
@@ -38,7 +38,7 @@ func TestBcEncrypt() {
 
 func TestBcPlainDb() {
 	testPath := "/tmp/test_sqlite3.db"
-	udwSqlite3.DeleteSqliteDbFileByPath(testPath)
+	udwSqlite3.MustDeleteSqliteDbFileByPath(testPath)
 	udwFile.MustWriteFileWithMkdir(testPath, getBcDbPlain())
 	defer udwFile.MustDelete(testPath)
 	db1 := udwSqlite3.MustNewDb(udwSqlite3.NewDbRequest{

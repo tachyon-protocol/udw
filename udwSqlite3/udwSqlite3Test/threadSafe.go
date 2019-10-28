@@ -10,8 +10,8 @@ import (
 
 func TestThreadSafe() {
 	const testDb = "/tmp/test_sqlite3.db"
-	udwSqlite3.DeleteSqliteDbFileByPath(testDb)
-	defer udwSqlite3.DeleteSqliteDbFileByPath(testDb)
+	udwSqlite3.MustDeleteSqliteDbFileByPath(testDb)
+	defer udwSqlite3.MustDeleteSqliteDbFileByPath(testDb)
 	db1 := udwSqlite3.MustNewDb(udwSqlite3.NewDbRequest{
 		FilePath:                       testDb,
 		EmptyDatabaseIfDatabaseCorrupt: true,

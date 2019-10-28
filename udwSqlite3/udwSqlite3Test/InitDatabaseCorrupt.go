@@ -13,8 +13,8 @@ import (
 
 func TestInitDatabaseCorrupt() {
 	const dbFilePath = "/tmp/test_sqlite3.db"
-	udwSqlite3.DeleteSqliteDbFileByPath(dbFilePath)
-	defer udwSqlite3.DeleteSqliteDbFileByPath(dbFilePath)
+	udwSqlite3.MustDeleteSqliteDbFileByPath(dbFilePath)
+	defer udwSqlite3.MustDeleteSqliteDbFileByPath(dbFilePath)
 
 	udwFile.MustWriteFile(dbFilePath, []byte("abc"))
 	err := udwErr.PanicToError(func() {
@@ -96,8 +96,8 @@ func TestInitDatabaseCorrupt2() {
 
 func TestInitDatabaseCorrupt3() {
 	const dbFilePath = "/tmp/test_sqlite3.db"
-	udwSqlite3.DeleteSqliteDbFileByPath(dbFilePath)
-	defer udwSqlite3.DeleteSqliteDbFileByPath(dbFilePath)
+	udwSqlite3.MustDeleteSqliteDbFileByPath(dbFilePath)
+	defer udwSqlite3.MustDeleteSqliteDbFileByPath(dbFilePath)
 	CallbackNum := udwSync.Int{}
 	testDbFn := func() {
 		db := udwSqlite3.MustNewDb(udwSqlite3.NewDbRequest{

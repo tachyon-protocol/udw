@@ -86,7 +86,7 @@ func (db *Db) handleEmptyDatabaseWhenCorrupt(errMsg string) (ok bool) {
 		if db.req.EmptyDatabaseIfDatabaseCorrupt {
 			udwLog.Log("erorr", "[udwSqlite3.isEmptyDatabaseWhenCorrupt]", "DatabaseCorrupt and emtry database now.", db.req.FilePath, errMsg)
 			db.cClose()
-			DeleteSqliteDbFileByPath(db.req.FilePath)
+			MustDeleteSqliteDbFileByPath(db.req.FilePath)
 			db.mustInitDbL1()
 			return true
 		}
@@ -94,7 +94,7 @@ func (db *Db) handleEmptyDatabaseWhenCorrupt(errMsg string) (ok bool) {
 	return false
 }
 
-func DeleteSqliteDbFileByPath(path string) {
+func MustDeleteSqliteDbFileByPath(path string) {
 	udwFile.MustDelete(path)
 	udwFile.MustDelete(path + "-shm")
 	udwFile.MustDelete(path + "-wal")

@@ -1,7 +1,6 @@
 package udwSqlite3Test
 
 import (
-	"github.com/tachyon-protocol/udw/udwFile"
 	"github.com/tachyon-protocol/udw/udwMap"
 	"github.com/tachyon-protocol/udw/udwSqlite3"
 	"github.com/tachyon-protocol/udw/udwTest"
@@ -10,7 +9,9 @@ import (
 
 func TestSpeedSingleSetGet() {
 
-	udwFile.MustDelete("/tmp/test_sqlite3.db")
+	const path = "/tmp/test_sqlite3.db"
+	udwSqlite3.MustDeleteSqliteDbFileByPath(path)
+	defer udwSqlite3.MustDeleteSqliteDbFileByPath(path)
 	testDb := udwSqlite3.MustNewDb(udwSqlite3.NewDbRequest{
 		FilePath: "/tmp/test_sqlite3.db",
 	})

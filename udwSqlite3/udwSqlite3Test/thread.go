@@ -11,8 +11,8 @@ import (
 func TestThread() {
 
 	const testDb = "/tmp/test_sqlite3.db"
-	udwSqlite3.DeleteSqliteDbFileByPath(testDb)
-	defer udwSqlite3.DeleteSqliteDbFileByPath(testDb)
+	udwSqlite3.MustDeleteSqliteDbFileByPath(testDb)
+	defer udwSqlite3.MustDeleteSqliteDbFileByPath(testDb)
 	db := udwSqlite3.MustNewDb(udwSqlite3.NewDbRequest{
 		FilePath: testDb,
 	})
@@ -50,8 +50,8 @@ func TestThread() {
 func TestThread2() {
 
 	const testDb = "/tmp/test_sqlite3.db"
-	udwSqlite3.DeleteSqliteDbFileByPath(testDb)
-	defer udwSqlite3.DeleteSqliteDbFileByPath(testDb)
+	udwSqlite3.MustDeleteSqliteDbFileByPath(testDb)
+	defer udwSqlite3.MustDeleteSqliteDbFileByPath(testDb)
 	db := udwSqlite3.MustNewDb(udwSqlite3.NewDbRequest{
 		FilePath: testDb,
 	})

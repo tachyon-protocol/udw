@@ -80,8 +80,8 @@ func TestInsert() {
 func MustRunTestDb(cb func(db *udwSqlite3.Db)) {
 	const dbPath = "/tmp/test_sqlite3.db"
 	udwFile.MustDelete(dbPath)
-	udwSqlite3.DeleteSqliteDbFileByPath(dbPath)
-	defer udwSqlite3.DeleteSqliteDbFileByPath(dbPath)
+	udwSqlite3.MustDeleteSqliteDbFileByPath(dbPath)
+	defer udwSqlite3.MustDeleteSqliteDbFileByPath(dbPath)
 	db := udwSqlite3.MustNewDb(udwSqlite3.NewDbRequest{
 		FilePath: "/tmp/test_sqlite3.db",
 	})
