@@ -11,11 +11,11 @@ func (db *Db) MustQuery(req QueryReq) {
 	}
 }
 
-func (db *Db) GetAllDataInTableToRowMap(tableName string) []map[string]string {
+func (db *Db) MustGetAllDataInTableToRowMap(tableName string) []map[string]string {
 	return db.mustQueryToMapRowList("SELECT * FROM " + mustEscapeTableOrDatabaseName(tableName) + " ")
 }
 
-func (db *Db) GetTableNameList() []string {
+func (db *Db) MustGetTableNameList() []string {
 	output := []string{}
 	errMsg := db.Query(QueryReq{
 		Query: "SELECT name FROM SQLITE_MASTER where type='table'",

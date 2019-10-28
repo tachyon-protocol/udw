@@ -19,7 +19,7 @@ func (db *Db) MustEmptyDatabase() {
 }
 
 func (db *Db) MustGetAllK1() []string {
-	tableNameList := db.GetTableNameList()
+	tableNameList := db.MustGetTableNameList()
 	output := []string{}
 	for _, tableName := range tableNameList {
 

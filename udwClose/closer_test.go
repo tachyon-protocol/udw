@@ -2,33 +2,10 @@ package udwClose
 
 import (
 	"fmt"
-	"github.com/tachyon-protocol/udw/udwSync"
 	"github.com/tachyon-protocol/udw/udwTest"
-	"sync"
 	"testing"
 	"time"
 )
-
-func TestCloser1(ot *testing.T) {
-	c := Closer{}
-	udwTest.Equal(c.IsClose(), false)
-	num := udwSync.NewInt(0)
-	wg := sync.WaitGroup{}
-	for i := 0; i < 10; i++ {
-		wg.Add(1)
-		go func() {
-			time.Sleep(10 * time.Millisecond)
-			c.CloseWithCallback(func() {
-				num.Add(1)
-			})
-			udwTest.Equal(num.Get(), 1)
-			wg.Done()
-		}()
-	}
-	wg.Wait()
-	udwTest.Equal(num.Get(), 1)
-	udwTest.Equal(c.IsClose(), true)
-}
 
 func TestCloser2(ot *testing.T) {
 	c := Closer{}

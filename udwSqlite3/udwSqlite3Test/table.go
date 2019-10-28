@@ -54,7 +54,7 @@ v LONGBLOB NOT NULL
 			[]byte("v1"),
 		},
 	})
-	m := db.GetAllDataInTableToRowMap("abc")
+	m := db.MustGetAllDataInTableToRowMap("abc")
 	udwTest.Equal(len(m), 1)
 	udwTest.Equal(m[0]["k"], "k1")
 	udwTest.Equal(m[0]["v"], "v1")
