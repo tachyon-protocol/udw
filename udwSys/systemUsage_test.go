@@ -1,7 +1,6 @@
 package udwSys
 
 import (
-	"github.com/tachyon-protocol/udw/udwMath"
 	"github.com/tachyon-protocol/udw/udwTest"
 	"testing"
 )

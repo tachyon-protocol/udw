@@ -137,7 +137,7 @@ func benchmarkResultString__NOLOCK() string {
 	buf.WriteString("/op] ")
 
 	if gBenchmarkCtx.sizePerRun > 0 {
-		buf.WriteString("bandwith:[")
+		buf.WriteString("bandwidth:[")
 		buf.WriteString(gbFromFloat64(float64(gBenchmarkCtx.num*gBenchmarkCtx.sizePerRun) / float64(gBenchmarkCtx.dur) * 1e9))
 		buf.WriteString("/s] ")
 	}

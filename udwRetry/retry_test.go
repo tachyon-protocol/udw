@@ -2,11 +2,9 @@ package udwRetry
 
 import (
 	"fmt"
-	"github.com/tachyon-protocol/udw/udwConsole"
 	"github.com/tachyon-protocol/udw/udwErr"
 	"github.com/tachyon-protocol/udw/udwTest"
 	"testing"
-	"time"
 )
 
 func TestRetry(t *testing.T) {
