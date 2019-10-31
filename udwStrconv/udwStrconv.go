@@ -111,6 +111,14 @@ func FormatBoolFalseEmpty(f bool) string {
 	}
 }
 
+func FormatBoolTrueEmpty(f bool) string {
+	if f == true {
+		return ""
+	} else {
+		return "false"
+	}
+}
+
 func FormatFloatPrec0(f float64) string {
 	return strconv.FormatFloat(f, 'f', 0, 64)
 }

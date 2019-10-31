@@ -18,11 +18,11 @@ func TestChan_ChanV2(t *testing.T) {
 			time.Sleep(time.Duration(d) * time.Millisecond)
 			_chan.Close()
 		}()
-		i, isClose := _chan.Receive()
+		ir, isClose := _chan.Receive()
 		if isClose {
 
 		} else {
-			_i, ok := i.(int)
+			_i, ok := ir.(int)
 			_ = _i
 			if ok {
 

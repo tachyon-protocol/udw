@@ -6,25 +6,25 @@ import (
 	"sync"
 )
 
-type Chan struct {
-	ch          chan interface{}
+type ChanBytes struct {
+	ch          chan []byte
 	isClosed    bool
 	lock        sync.RWMutex
 	closeSignal chan struct{}
 }
 
-func MakeChan(bufferSize int) *Chan {
+func MakeChanBytes(bufferSize int) *ChanBytes {
 	if bufferSize < 0 {
 		return nil
 	}
-	sc := &Chan{
-		ch:          make(chan interface{}, bufferSize),
+	sc := &ChanBytes{
+		ch:          make(chan []byte, bufferSize),
 		closeSignal: make(chan struct{}),
 	}
 	return sc
 }
 
-func (c *Chan) Send(data interface{}) (isClose bool) {
+func (c *ChanBytes) Send(data []byte) (isClose bool) {
 	c.lock.RLock()
 	isClose = c.isClosed
 	if isClose {
@@ -39,7 +39,7 @@ func (c *Chan) Send(data interface{}) (isClose bool) {
 	return
 }
 
-func (c *Chan) SendIfEmpty(data interface{}) (isClose bool, isSuccess bool) {
+func (c *ChanBytes) SendIfEmpty(data []byte) (isClose bool, isSuccess bool) {
 	c.lock.RLock()
 	isClose = c.isClosed
 	if isClose {
@@ -57,11 +57,11 @@ func (c *Chan) SendIfEmpty(data interface{}) (isClose bool, isSuccess bool) {
 	return
 }
 
-func (c *Chan) GetReceiveCh() <-chan interface{} {
+func (c *ChanBytes) GetReceiveCh() <-chan []byte {
 	return c.ch
 }
 
-func (c *Chan) Receive() (data interface{}, isClose bool) {
+func (c *ChanBytes) Receive() (data []byte, isClose bool) {
 	c.lock.RLock()
 	if c.isClosed {
 		c.lock.RUnlock()
@@ -72,8 +72,7 @@ func (c *Chan) Receive() (data interface{}, isClose bool) {
 	return i, !ok
 }
 
-func (c *Chan) Close() {
-
+func (c *ChanBytes) Close() {
 	err := udwErr.PanicToError(func() {
 		close(c.closeSignal)
 	})
@@ -92,7 +91,7 @@ func (c *Chan) Close() {
 	c.lock.Unlock()
 }
 
-func (c *Chan) IsClosed() bool {
+func (c *ChanBytes) IsClosed() bool {
 	c.lock.RLock()
 	isClosed := c.isClosed
 	c.lock.RUnlock()
