@@ -114,6 +114,9 @@ func (w *BufWriter) WriteLittleEndUint64(v uint64) {
 func (w *BufWriter) WriteLittleEndFloat64(f float64) {
 	w.WriteLittleEndUint64(math.Float64bits(f))
 }
+func (w *BufWriter) WriteLittleEndFloat32(f float32) {
+	w.WriteLittleEndUint32(math.Float32bits(f))
+}
 func (w *BufWriter) MustWriteString255(s string) {
 	if len(s) > 255 {
 		panic(fmt.Errorf("[MustWriteString255] len(s)[%d]>255", len(s)))

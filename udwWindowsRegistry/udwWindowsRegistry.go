@@ -126,7 +126,7 @@ func getFirstKeyByString(firstKey string) (first Key, errMsg string) {
 	case "USERS", "HKEY_USERS":
 		return USERS, ""
 	default:
-		return 0, "[getFirstKeyByString] unkown first part of the path [" + firstKey + "]"
+		return 0, "[getFirstKeyByString] unknown first part of the path [" + firstKey + "]"
 	}
 }
 

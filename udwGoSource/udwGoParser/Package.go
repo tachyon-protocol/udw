@@ -44,7 +44,7 @@ func (pkg *Package) AddImport(pkgPath string) {
 
 func (pkg *Package) GetNamedTypeMethodSet(typ *NamedType) (output []*FuncOrMethodDeclaration) {
 	if !(typ.PkgImportPath == pkg.pkgImportPath) {
-		panic(fmt.Errorf("can not get MethodSet on diff pacakge typ[%s] pkg[%s]", typ.PkgImportPath, pkg.pkgImportPath))
+		panic(fmt.Errorf("can not get MethodSet on diff package typ[%s] pkg[%s]", typ.PkgImportPath, pkg.pkgImportPath))
 	}
 	for _, decl := range pkg.methodList {
 		recvier := decl.ReceiverType

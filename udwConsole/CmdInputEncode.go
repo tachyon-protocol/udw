@@ -155,7 +155,7 @@ func RunCommandLineFromFuncV3(req RunCommandLineFromFuncV3Request) (errMsg strin
 			}
 		}
 	}
-	cmdName := "unkownCommandName"
+	cmdName := "unknownCommandName"
 	if len(req.OsArgList) >= 1 {
 		cmdName = req.OsArgList[0]
 	}
