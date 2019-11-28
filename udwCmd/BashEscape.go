@@ -6,7 +6,8 @@ import (
 )
 
 func BashEscape(inS string) (outS string) {
-	return "'" + strings.Replace(inS, "'", `'"'"'`, -1) + "'"
+
+	return "'" + strings.Replace(inS, "'", `'\''`, -1) + "'"
 }
 
 func BashEscapeSlice(in []string) (outS string) {

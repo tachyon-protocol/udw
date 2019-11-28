@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/tachyon-protocol/udw/udwMap"
-	"github.com/tachyon-protocol/udw/udwReflect"
 	"github.com/tachyon-protocol/udw/udwSort"
 	"github.com/tachyon-protocol/udw/udwStrconv"
 	"path"
@@ -147,9 +146,9 @@ func mustMarshalFromReflectL2(ctx MustGoTypeMarshalContext, reflectValue reflect
 			return
 		}
 		elemValue := reflectValue.Elem()
-		canNotAddressableFnName := ""
 		switch elemValue.Kind() {
 		case reflect.Bool, reflect.String, reflect.Float64, reflect.Int:
+			canNotAddressableFnName := ""
 			switch elemValue.Type().Name() {
 			case "bool":
 				canNotAddressableFnName = "PtrBool"
@@ -160,27 +159,37 @@ func mustMarshalFromReflectL2(ctx MustGoTypeMarshalContext, reflectValue reflect
 			case "int":
 				canNotAddressableFnName = "PtrInt"
 			}
-		}
-		if canNotAddressableFnName == "" {
+			if canNotAddressableFnName != "" {
+				ctx.AddTypeNameWithImportPackage("github.com/tachyon-protocol/udw/udwGoSource/udwGoWriter/udwGoTypeMarshal/udwGoTypeMarshalLib", canNotAddressableFnName, _buf)
+				_buf.WriteByte('(')
+				mustMarshalFromReflectL1(ctx, elemValue, _buf)
+				_buf.WriteByte(')')
+				return
+			}
+
+		case reflect.Struct, reflect.Slice:
 			_buf.WriteByte('&')
 			mustMarshalFromReflectL1(ctx, elemValue, _buf)
 			return
-		} else {
-			ctx.AddTypeNameWithImportPackage("github.com/tachyon-protocol/udw/udwGoSource/udwGoWriter/udwGoTypeMarshal/udwGoTypeMarshalLib", canNotAddressableFnName, _buf)
-			_buf.WriteByte('(')
-			mustMarshalFromReflectL1(ctx, elemValue, _buf)
-			_buf.WriteByte(')')
 		}
+
+		_buf.WriteString("func()")
+		WriteReflectTypeNameToGoFile(ctx, reflectValue.Type(), _buf)
+		_buf.WriteString("{_a:=")
+		mustMarshalFromReflectL1(ctx, elemValue, _buf)
+		_buf.WriteString(";return &_a}()")
 		return
 	case reflect.Struct:
 		t := reflectValue.Type()
 		WriteReflectTypeNameToGoFile(ctx, t, _buf)
 		_buf.WriteString("{\n")
-		for _, field := range udwReflect.StructGetAllField(t) {
+		nf := t.NumField()
+		for i := 0; i < nf; i++ {
+			field := t.Field(i)
 			if ctx.IsMarshalUnexport == false && field.PkgPath != "" {
 				continue
 			}
-			thisV := reflectValue.FieldByIndex(field.Index)
+			thisV := reflectValue.Field(i)
 			if isEmptyValue(thisV) {
 				continue
 			}
@@ -413,23 +422,59 @@ func isEmptyValue(v reflect.Value) bool {
 	case reflect.String:
 		return v.String() == ""
 	case reflect.Ptr:
-		return v.IsNil()
+		return v.IsNil() || isEmptyValue(v.Elem())
 	case reflect.Float64, reflect.Float32:
 		return v.Float() == 0
 	case reflect.Slice:
 		return v.IsNil() || v.Len() == 0
-	case reflect.Struct:
-		isAllEmpty := true
-		for _, field := range udwReflect.StructGetAllField(v.Type()) {
-			thisV := v.FieldByIndex(field.Index)
-			if !isEmptyValue(thisV) {
-				isAllEmpty = false
+	case reflect.Array:
+		l := v.Len()
+		if l == 0 {
+			return true
+		}
+		for i := 0; i < l; i++ {
+			if isEmptyValue(v.Index(i)) == false {
+				return false
 			}
 		}
-		return isAllEmpty
+		return true
+	case reflect.Struct:
+		nf := v.NumField()
+		for i := 0; i < nf; i++ {
+			thisV := v.Field(i)
+			if isEmptyValue(thisV) == false {
+				return false
+			}
+		}
+		return true
+	case reflect.Map:
+		return v.Len() == 0
 	default:
 		return false
 	}
+}
+
+func isEmptyStructField(v reflect.Value, field *reflect.StructField) bool {
+	if len(field.Index) == 1 {
+		return isEmptyValue(v.Field(field.Index[0]))
+	}
+	for i, x := range field.Index {
+		if i > 0 {
+			if v.Kind() == reflect.Ptr {
+				if v.IsNil() {
+					return true
+				}
+				if v.Elem().Kind() == reflect.Struct {
+					v = v.Elem()
+				}
+			}
+		}
+		v = v.Field(x)
+	}
+	if isEmptyValue(v) {
+		return true
+	}
+	return false
 }
 
 func writeStringWithCtx(ctx MustGoTypeMarshalContext, s string, _buf *bytes.Buffer) {

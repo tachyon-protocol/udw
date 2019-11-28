@@ -104,7 +104,7 @@ func ReadByteSliceWithUint32LenToBufW(r io.Reader, bufW *udwBytes.BufWriter) (er
 		if err == io.ErrUnexpectedEOF && rn == 0 {
 			return io.EOF
 		}
-		return errors.New("24fm8ux7ba " + err.Error())
+		return err
 	}
 	size := binary.LittleEndian.Uint32(sizeBuf)
 	if size == 0 {

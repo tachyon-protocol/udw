@@ -36,6 +36,10 @@ func NewIdLen10() (outS string) {
 	return NewId()[:10]
 }
 
+func NewIdLen4() (outS string) {
+	return NewId()[:4]
+}
+
 func NewIdLikeUuid() string {
 	byteId := newIdByte()
 	return strings.Join([]string{

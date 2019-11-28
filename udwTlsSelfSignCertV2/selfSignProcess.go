@@ -6,11 +6,11 @@ import (
 	"crypto/rand"
 	"crypto/tls"
 	"crypto/x509"
-	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
 	"github.com/tachyon-protocol/udw/udwTime"
 	"math/big"
+	"net"
 	"sync"
 	"time"
 )
@@ -32,9 +32,7 @@ func getSelfSignProcessInit() {
 		notAfter := startTime.Add(100 * udwTime.Year)
 		template := x509.Certificate{
 			SerialNumber: big.NewInt(1),
-			Subject: pkix.Name{
-				Organization: []string{"Fake Cert"},
-			},
+
 			NotBefore: notBefore,
 			NotAfter:  notAfter,
 
@@ -42,6 +40,7 @@ func getSelfSignProcessInit() {
 			ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			BasicConstraintsValid: true,
 		}
+		template.IPAddresses = []net.IP{net.IPv4(127, 0, 0, 1)}
 		priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 		if err != nil {
 			fmt.Println("rrndw9buaa", err)

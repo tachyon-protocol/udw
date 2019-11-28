@@ -2,6 +2,7 @@ package udwConsole
 
 import (
 	"fmt"
+	"github.com/tachyon-protocol/udw/udwJson"
 	"os"
 	"sort"
 	"strings"
@@ -11,11 +12,12 @@ import (
 var VERSION = ""
 
 type Command struct {
-	Name   string
-	Desc   string
-	Runner func()
-	FuncV2 interface{}
-	Hidden bool
+	Name       string
+	Desc       string
+	Runner     func()
+	FuncV2     interface{}
+	Hidden     bool
+	CompleteFn CompletionFn
 }
 
 func (action *Command) runAction() {
@@ -119,8 +121,9 @@ func (g *CommandGroup) AddCommandWithName(name string, f interface{}) *CommandGr
 	}
 	mustEnsureValidFuncV2(f)
 	return g.AddCommand(Command{
-		Name:   name,
-		FuncV2: f,
+		Name:       name,
+		FuncV2:     f,
+		CompleteFn: NewCompletionBuilder().ReflectArg(f).Finish(),
 	})
 
 }
@@ -133,6 +136,29 @@ func GetDefaultCommandGroup() *CommandGroup {
 		gDefaultCommandGroup = NewCommandGroup()
 	})
 	return gDefaultCommandGroup
+}
+
+func (g *CommandGroup) CompleteCmd(args []string) (waitSelectList []string) {
+	udwJson.MustWriteFileIndent(`/tmp/1.json`, args)
+	if len(args) < 2 {
+		return nil
+	}
+	if len(args) == 2 {
+		for _, cmd := range g.commandMap {
+			if cmd.Hidden {
+				continue
+			}
+			waitSelectList = append(waitSelectList, cmd.Name)
+		}
+		sort.Strings(waitSelectList)
+	} else {
+		subCmdName := strings.ToLower(args[1])
+		subCmd, ok := g.commandMap[subCmdName]
+		if ok && subCmd.CompleteFn != nil {
+			_, waitSelectList = subCmd.CompleteFn(args)
+		}
+	}
+	return waitSelectList
 }
 
 func Main() {

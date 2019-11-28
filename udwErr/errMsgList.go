@@ -10,7 +10,13 @@ type ErrmsgList struct {
 	List []string
 }
 
+func (l *ErrmsgList) AddError(err error) {
+	l.AddErrMsg(ErrorToMsg(err))
+}
 func (l *ErrmsgList) AddErrMsg(errMsg string) {
+	if errMsg == "" {
+		return
+	}
 	l.List = append(l.List, errMsg)
 }
 

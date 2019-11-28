@@ -16,3 +16,7 @@ func (packet *IpPacket) GetDnsQueryName() string {
 	}
 	return dnsPacket.QuestionName
 }
+
+func (packet *IpPacket) IsDnsResponse() bool {
+	return packet.IsUdp() && packet.GetSrcPort() == udwDnsPacket.DnsPort
+}
