@@ -21,6 +21,11 @@ func Sha3512First16(content []byte) []byte {
 	return outBuf[:16]
 }
 
+func Sha3512(content []byte) []byte {
+	outBuf := Sum512(content)
+	return outBuf[:]
+}
+
 func Sha3512ToHexStringFromString(content string) string {
 	return Sha3512ToHexString([]byte(content))
 }
