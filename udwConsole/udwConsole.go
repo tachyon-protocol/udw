@@ -121,9 +121,11 @@ func (g *CommandGroup) AddCommandWithName(name string, f interface{}) *CommandGr
 	}
 	mustEnsureValidFuncV2(f)
 	return g.AddCommand(Command{
-		Name:       name,
-		FuncV2:     f,
-		CompleteFn: NewCompletionBuilder().ReflectArg(f).Finish(),
+		Name:   name,
+		FuncV2: f,
+		CompleteFn: CreateCompletion(CreateCompletionReq{
+			ReflectArgOfFunc: f,
+		}),
 	})
 
 }

@@ -145,3 +145,27 @@ type errorReader struct {
 func (r *errorReader) Read(buf []byte) (n int, err error) {
 	return 0, errors.New("ur4twn348w")
 }
+
+func TestBufWriter_1(ot *testing.T) {
+	const num = 10
+	udwTest.BenchmarkSetName("string add")
+	udwTest.Benchmark(func() {
+		udwTest.BenchmarkSetNum(num)
+		s := ""
+		for i := 0; i < num; i++ {
+			s += "1"
+		}
+		buf := []byte(s)
+		_ = buf
+	})
+	udwTest.BenchmarkSetName("BufWriter add")
+	udwTest.Benchmark(func() {
+		udwTest.BenchmarkSetNum(num)
+		bufW := BufWriter{}
+		for i := 0; i < num; i++ {
+			bufW.WriteString_("1")
+		}
+		buf := bufW.GetBytes()
+		_ = buf
+	})
+}

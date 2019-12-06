@@ -5,40 +5,48 @@ import (
 	"strings"
 )
 
-type CompletionBuilder struct {
-	fnList []CompletionFn
+type CreateCompletionReq struct {
+	AfterArgListMap  map[string][]string
+	ReflectArgOfFunc interface{}
+	SelfDefineFnList []CompletionFn
+}
+
+func CreateCompletion(req CreateCompletionReq) CompletionFn {
+	var fnList []CompletionFn
+	for pre, after := range req.AfterArgListMap {
+		fnList = append(fnList, afterArgList(pre, after))
+	}
+	fn := reflectArg(req.ReflectArgOfFunc)
+	if fn != nil {
+		fnList = append(fnList, fn)
+	}
+	fnList = append(fnList, req.SelfDefineFnList...)
+	return func(args []string) (accept bool, waitSelect []string) {
+		for _, fn := range fnList {
+			accept, waitSelect = fn(args)
+			if accept {
+				break
+			}
+		}
+		return true, waitSelect
+	}
 }
 
 type CompletionFn func(args []string) (accept bool, waitSelect []string)
 
-func NewCompletionBuilder() *CompletionBuilder {
-	return &CompletionBuilder{}
-}
-
-func (this *CompletionBuilder) Common(fn CompletionFn) *CompletionBuilder {
-	this.fnList = append(this.fnList, fn)
-	return this
-}
-
-func (this *CompletionBuilder) ReflectArg(fn interface{}) *CompletionBuilder {
+func reflectArg(fn interface{}) CompletionFn {
 	fv := reflect.ValueOf(fn)
 	if fv.Kind() != reflect.Func || fv.Type().NumIn() != 1 {
-		return this
+		return nil
 	}
 	av := fv.Type().In(0)
 	if av.Kind() == reflect.Ptr {
 		av = av.Elem()
 	}
 	if av.Kind() != reflect.Struct {
-		return this
+		return nil
 	}
-	for idx := 0; idx < av.NumField(); idx++ {
-		f := av.Field(idx)
-		if f.Type.Kind() == reflect.Bool {
-			this.AfterArgList(`-`+f.Name, []string{`True`, `False`})
-		}
-	}
-	this.Common(func(args []string) (accept bool, waitSelect []string) {
+	return func(args []string) (accept bool, waitSelect []string) {
 		if len(args) < 1 {
 			return false, nil
 		}
@@ -58,12 +66,11 @@ func (this *CompletionBuilder) ReflectArg(fn interface{}) *CompletionBuilder {
 			}
 		}
 		return true, waitSelect
-	})
-	return this
+	}
 }
 
-func (this *CompletionBuilder) AfterArgList(name string, list []string) *CompletionBuilder {
-	return this.Common(func(args []string) (accept bool, waitSelect []string) {
+func afterArgList(name string, list []string) CompletionFn {
+	return func(args []string) (accept bool, waitSelect []string) {
 		if len(args) < 2 {
 			return false, nil
 		}
@@ -72,18 +79,6 @@ func (this *CompletionBuilder) AfterArgList(name string, list []string) *Complet
 			return false, nil
 		}
 		waitSelect = list
-		return true, waitSelect
-	})
-}
-
-func (this *CompletionBuilder) Finish() CompletionFn {
-	return func(args []string) (accept bool, waitSelect []string) {
-		for _, fn := range this.fnList {
-			accept, waitSelect = fn(args)
-			if accept {
-				break
-			}
-		}
 		return true, waitSelect
 	}
 }
