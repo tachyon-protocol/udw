@@ -8,3 +8,6 @@ Golang Library
 * udwBuild.MustBuild   a framework for auto generate code in the project xxx_Build package
 * udwFile.MustWrite    write content to a file, panic if it fail.
 * udwFile.MustGetAllFiles get all files fullpath from a input path.
+
+This product includes GeoLite2 data created by MaxMind, available from
+<a href="https://www.maxmind.com">https://www.maxmind.com</a>.
