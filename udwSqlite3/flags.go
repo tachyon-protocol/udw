@@ -4,7 +4,7 @@ package udwSqlite3
 // enable encryption codec in sqlite
 #cgo CFLAGS: -DSQLITE_HAS_CODEC
 
-// use memory for temporay storage in sqlite
+// use memory for temporary storage in sqlite
 #cgo CFLAGS: -DSQLITE_TEMP_STORE=2
 
 // use libtomcrypt implementation in sqlcipher

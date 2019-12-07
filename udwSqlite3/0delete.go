@@ -56,3 +56,14 @@ func (db *Db) MustEmptyK1(k1 string) {
 func (db *Db) IMustDelete(k1 string, k2 string) {
 	db.MustDelete(k1, k2)
 }
+
+func (db *Db) MustDeleteWithKv(k1 string, k2 string, v string) {
+	errMsg := db.querySkipResult(`DELETE FROM `+db.getTableNameFromK1(k1)+` WHERE k=? AND v=?`, []byte(k2), []byte(v))
+	if errMsg != "" {
+		if errorIsTableNotExist(errMsg) {
+			return
+		}
+		panic(errMsg)
+	}
+	return
+}
