@@ -12,38 +12,56 @@ import (
 )
 
 type Ipv4NetSet struct {
-	list  []Ipv4Net
+	List  []Ipv4Net
 	listB []Ipv4Net
 }
 
 func NewAllPassIpv4Net() *Ipv4NetSet {
 	set := &Ipv4NetSet{
-		list: []Ipv4Net{0},
+		List: []Ipv4Net{0},
 	}
 
 	return set
 }
 
+func (set *Ipv4NetSet) MergeIPNet(ipnet Ipv4Net) {
+	newList := set.listB[:0]
+	for i := range set.List {
+
+		if set.List[i].ContainIPNet(ipnet) {
+			return
+		}
+
+		if ipnet.ContainIPNet(set.List[i]) {
+			continue
+		}
+		newList = append(newList, set.List[i])
+	}
+	newList = append(newList, ipnet)
+	set.listB = set.List
+	set.List = newList
+}
+
 func (set *Ipv4NetSet) RemoveIPNet(ipnet Ipv4Net) {
 	newList := set.listB[:0]
-	for i := range set.list {
-		if set.list[i].Equal(ipnet) {
+	for i := range set.List {
+		if set.List[i].Equal(ipnet) {
 
 			continue
 		}
-		if ipnet.ContainIPNet(set.list[i]) {
+		if ipnet.ContainIPNet(set.List[i]) {
 
 			continue
 		}
-		if set.list[i].ContainIPNet(ipnet) {
+		if set.List[i].ContainIPNet(ipnet) {
 
 			thisIp := uint32(0)
 			ipNetIpUint32 := ipnet.GetUint32Ip()
-			for j := 0; j < set.list[i].GetPrefix(); j++ {
+			for j := 0; j < set.List[i].GetPrefix(); j++ {
 				bit := udwBitwise.Uint32GetBit(ipNetIpUint32, 31-j)
 				thisIp = udwBitwise.Uint32SetBit(thisIp, 31-j, bit)
 			}
-			for j := set.list[i].GetPrefix(); j < ipnet.GetPrefix(); j++ {
+			for j := set.List[i].GetPrefix(); j < ipnet.GetPrefix(); j++ {
 				bit := udwBitwise.Uint32GetBit(ipNetIpUint32, 31-j)
 
 				thisIp = udwBitwise.Uint32SetBit(thisIp, 31-j, bit)
@@ -55,15 +73,15 @@ func (set *Ipv4NetSet) RemoveIPNet(ipnet Ipv4Net) {
 
 			continue
 		}
-		newList = append(newList, set.list[i])
+		newList = append(newList, set.List[i])
 	}
-	set.listB = set.list
-	set.list = newList
+	set.listB = set.List
+	set.List = newList
 }
 
 func (set *Ipv4NetSet) ContainIP(ip net.IP) bool {
-	for i := range set.list {
-		if set.list[i].ContainIP(ip) {
+	for i := range set.List {
+		if set.List[i].ContainIP(ip) {
 			return true
 		}
 	}
@@ -102,16 +120,16 @@ func (set *Ipv4NetSet) GetIpv4NetList() []Ipv4Net {
 		return nil
 	}
 	set.Sort()
-	return set.list
+	return set.List
 }
 func (set *Ipv4NetSet) Sort() {
-	udwSort.InterfaceCallbackSortWithIndexLess(set.list, func(a int, b int) bool {
-		aIp := set.list[a].GetUint32Ip()
-		bIp := set.list[b].GetUint32Ip()
+	udwSort.InterfaceCallbackSortWithIndexLess(set.List, func(a int, b int) bool {
+		aIp := set.List[a].GetUint32Ip()
+		bIp := set.List[b].GetUint32Ip()
 		if aIp != bIp {
 			return aIp < bIp
 		}
-		return set.list[a].GetPrefix() < set.list[b].GetPrefix()
+		return set.List[a].GetPrefix() < set.List[b].GetPrefix()
 	})
 }
 
@@ -119,6 +137,14 @@ type Ipv4Net uint64
 
 func NewIpv4NetFromUint32IpAndPrefix(ip uint32, prefix int) Ipv4Net {
 	return Ipv4Net(uint64(ip) | uint64((uint64(prefix)&0xff)<<32))
+}
+
+func NewIpv4NetFromIP(s string) Ipv4Net {
+	return MustParseIpv4Net(s + "/32")
+}
+
+func NewIpv4NetFromIPAndPrefixString(s string) Ipv4Net {
+	return MustParseIpv4Net(s)
 }
 
 func MustParseIpv4Net(s string) Ipv4Net {
@@ -180,4 +206,7 @@ func (thisIpNet Ipv4Net) ToGoIPNet() *net.IPNet {
 		panic(err)
 	}
 	return ipnet
+}
+func (thisIpNet Ipv4Net) GetMaskIpString() string {
+	return net.IP(net.CIDRMask(thisIpNet.GetPrefix(), len(thisIpNet.GetIp())*8)).String()
 }

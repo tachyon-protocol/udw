@@ -24,7 +24,8 @@ func IsErrorMsgSocketClose(errMsg string) bool {
 	return errMsg == "EOF" || errMsg == "io: read/write on closed pipe" ||
 		strings.Contains(errMsg, "use of closed network connection") ||
 		strings.Contains(errMsg, "socket is not connected") ||
-		strings.Contains(errMsg, "broken pipe")
+		strings.Contains(errMsg, "broken pipe") ||
+		strings.Contains(errMsg, "reset by peer")
 }
 
 func IsUseOfClosedNetworkConnection(err error) bool {

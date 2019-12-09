@@ -143,7 +143,7 @@ func TestIpv4Net2(ot *testing.T) {
 }
 
 func ipv4MustNotHasOverlap(set *Ipv4NetSet) {
-	list := set.list
+	list := set.List
 	for i := range list {
 		for j := range list {
 			if i == j {

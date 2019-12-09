@@ -203,7 +203,6 @@ func parseSyscallOneRouteRow(thisPart []byte, interfaceIndexMap map[int]*NetDevi
 		return thisRule
 	}
 
-	udwLog.Log("[7nf6sfk4sn] WARNING")
 	return nil
 
 }

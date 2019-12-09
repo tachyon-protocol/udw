@@ -6,14 +6,29 @@ import (
 )
 
 func BuildAndTest() {
+
 	udwRpc2Builder.Generate(udwRpc2Builder.GenerateReq{
 		RpcDefine:      getRpcService(),
-		TargetPkgPath:  "main",
+		FromPkgPath:    "github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Tester/udwRpc2Demo",
+		FromObjName:    "Server",
+		TargetPkgPath:  "github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Tester/udwRpc2Demo",
 		Prefix:         "Demo",
 		TargetFilePath: "src/github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Tester/udwRpc2Demo/zzzig_Demo.go",
 		GoFmt:          true,
 	})
-	udwCmd.MustRun("go run github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Tester/udwRpc2Demo")
+
+	udwRpc2Builder.Generate(udwRpc2Builder.GenerateReq{
+		RpcDefine:        getRpcService(),
+		FromPkgPath:      "github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Tester/udwRpc2Demo",
+		FromObjName:      "Server",
+		TargetPkgPath:    "main",
+		Prefix:           "D2",
+		TargetFilePath:   "src/github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Tester/udwRpc2DemoClient/zzzig_D2.go",
+		GoFmt:            true,
+		DisableGenServer: true,
+	})
+	udwCmd.MustRun("go run github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Tester/udwRpc2DemoClient")
+
 }
 
 func getRpcService() udwRpc2Builder.RpcService {
@@ -71,6 +86,16 @@ func getRpcService() udwRpc2Builder.RpcService {
 					{
 						Type: udwRpc2Builder.RpcType{
 							Kind: udwRpc2Builder.RpcTypeKindString,
+						},
+					},
+					{
+						Type: udwRpc2Builder.RpcType{
+							Kind: udwRpc2Builder.RpcTypeKindSlice,
+							Elem: &udwRpc2Builder.RpcType{
+								Kind:       udwRpc2Builder.RpcTypeKindNamedStruct,
+								StructName: "Tstruct",
+								GoPkg:      "github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Tester/udwRpc2Demo",
+							},
 						},
 					},
 				},

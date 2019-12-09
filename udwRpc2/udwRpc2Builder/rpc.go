@@ -93,11 +93,13 @@ func mustRpcTypeToGoTypeName(writer *udwGoParser.GoFileWriter, Type *RpcType) st
 	case RpcTypeKindInt:
 		return "int"
 	case RpcTypeKindNamedStruct:
-		writer.AddImportPath(Type.GoPkg)
-		if Type.GoPkg == writer.GetPkgImportPath() {
+		if Type.GoPkg == "" || Type.GoPkg == writer.GetPkgImportPath() {
 			return Type.StructName
 		}
+		writer.AddImportPath(Type.GoPkg)
 		return path.Base(Type.GoPkg) + "." + Type.StructName
+	case RpcTypeKindSlice:
+		return "[]" + mustRpcTypeToGoTypeName(writer, Type.Elem)
 	default:
 		panic("not support Type [" + Type.Kind + "]")
 	}

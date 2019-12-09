@@ -9,11 +9,15 @@ import (
 )
 
 type GenerateReq struct {
-	RpcDefine      RpcService
-	TargetPkgPath  string
-	Prefix         string
-	TargetFilePath string
-	GoFmt          bool
+	RpcDefine        RpcService
+	FromPkgPath      string
+	FromObjName      string
+	TargetPkgPath    string
+	Prefix           string
+	TargetFilePath   string
+	GoFmt            bool
+	DisableGenServer bool
+	DisableGenClient bool
 }
 
 func Generate(req GenerateReq) {
@@ -23,8 +27,12 @@ func Generate(req GenerateReq) {
 	initRpcDefine(&ctx.req.RpcDefine)
 	ctx.goFileWriter = udwGoParser.NewGoFileContext(req.TargetPkgPath)
 	ctx.goFileWriter.AddImportPath("github.com/tachyon-protocol/udw/udwRpc2")
-	ctx.generateServer()
-	ctx.generateClient()
+	if req.DisableGenServer == false {
+		ctx.generateServer()
+	}
+	if req.DisableGenClient == false {
+		ctx.generateClient()
+	}
 	ctx.goFileWriter.MustWriteFile(req.TargetFilePath, ctx.goFileBuf.GetBytes())
 	if req.GoFmt {
 		content := udwFile.MustReadFile(req.TargetFilePath)
@@ -50,7 +58,11 @@ func (ctx *generateCtx) newName() string {
 
 func (ctx *generateCtx) generateServer() {
 	ctx.goFileBuf.WriteString_(`func ` + ctx.req.Prefix + `_RunServer(addr string) (closer func()){
-	s:=Server{}
+	s:=` + mustRpcTypeToGoTypeName(ctx.goFileWriter, &RpcType{
+		Kind:       RpcTypeKindNamedStruct,
+		StructName: ctx.req.FromObjName,
+		GoPkg:      ctx.req.FromPkgPath,
+	}) + `{}
 	sh:=udwRpc2.NewServerHub(udwRpc2.ServerReq{
 		Addr: addr,
 		Handler: func(ctx *udwRpc2.ReqCtx){
@@ -144,7 +156,7 @@ func (ctx *generateCtx) generateClient() {
 	c:=udwRpc2.NewClientHub(udwRpc2.ClientReq{
 		Addr: addr,
 	})
-	return &Demo_Client{
+	return &` + ctx.req.Prefix + `_Client{
 		ch: c,
 	}
 }

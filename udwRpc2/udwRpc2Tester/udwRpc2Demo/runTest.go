@@ -1,13 +1,9 @@
-package main
+package udwRpc2Demo
 
 import (
 	"fmt"
 	"github.com/tachyon-protocol/udw/udwTest"
 )
-
-func main() {
-	RunTest()
-}
 
 func RunTest() {
 	runTest1()
@@ -51,14 +47,14 @@ func runTest1() {
 }
 
 func checkFnp(c *Demo_Client) {
-	o1, o2, o3, rpcErr := c.FnP("a1", "a2", "a3")
+	o1, o2, o3, rpcErr := c.FnP("a1", "a2", "a3", []Tstruct{{"1"}})
 	if rpcErr != nil {
 		fmt.Println("checkFnp fail", rpcErr.Error())
 	}
 	udwTest.Ok(rpcErr == nil)
 	udwTest.Equal(o1, "a1")
 	udwTest.Equal(o2, "a2")
-	udwTest.Equal(o3, "a3")
+	udwTest.Equal(o3, "a3_1")
 }
 func runTestNoServer() {
 	c := Demo_NewClient("127.0.0.1:8081")
