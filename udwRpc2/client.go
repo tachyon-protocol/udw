@@ -91,12 +91,14 @@ func (ch *ClientHub) RequestCb(cb func(ctx *ReqCtx)) (errMsg string) {
 	errMsg = udwErr.PanicToErrorMsgWithStack(func() {
 		cb(ctx)
 	})
-	errMsg2 := ctx.Close()
-	if errMsg2 != "" {
-		errMsg += " " + errMsg2
+	if errMsg != "" {
+		ctx.Close()
+		return errMsg
 	}
-	ch.putConn(conn)
-	return errMsg
+	if ctx.conn.closer.IsClose() == false {
+		ch.putConn(conn)
+	}
+	return ""
 }
 
 func (ch *ClientHub) getConnWithTimeout(deadline time.Time) (mc *Conn, errMsg string) {

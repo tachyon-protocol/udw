@@ -193,12 +193,14 @@ type ` + ctx.req.Prefix + `_Client struct{
 		errMsg:=ctx.GetWriter().Flush()
 		if errMsg!=""{
 			RpcErr = udwRpc2.NewNetworkError("dehqx82rjj "+errMsg)
+			ctx.Close()
 			return
 		}
 		var s string
 		errMsg = ctx.GetReader().ReadValue(&s)
 		if errMsg!=""{
 			RpcErr = udwRpc2.NewNetworkError("ehtjkea4re "+errMsg)
+			ctx.Close()
 			return
 		}
 		if s!=""{
@@ -211,6 +213,7 @@ type ` + ctx.req.Prefix + `_Client struct{
 			ctx.goFileBuf.WriteString_(`		errMsg = ctx.GetReader().ReadValue(&` + parameter.Name + `)
 		if errMsg!=""{
 			RpcErr = udwRpc2.NewNetworkError("kvkdcgtnk2 "+errMsg)
+			ctx.Close()
 			return
 		}
 `)
@@ -218,6 +221,7 @@ type ` + ctx.req.Prefix + `_Client struct{
 		ctx.goFileBuf.WriteString_(`		errMsg = ctx.GetReader().ReadArrayEnd()
 		if errMsg!=""{
 			RpcErr = udwRpc2.NewNetworkError("4b7rug5mf2 "+errMsg)
+			ctx.Close()
 			return
 		}
 		RpcErr = nil

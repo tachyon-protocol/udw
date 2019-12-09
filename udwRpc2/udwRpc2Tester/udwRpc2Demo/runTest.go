@@ -2,16 +2,19 @@ package udwRpc2Demo
 
 import (
 	"fmt"
+	"github.com/tachyon-protocol/udw/udwNet"
 	"github.com/tachyon-protocol/udw/udwTest"
+	"net"
 )
 
 func RunTest() {
 	runTest1()
 	runTestNoServer()
+	runTestWrongServer()
 }
 
 func runTest1() {
-	closer := Demo_RunServer(":8080")
+	closer := Demo_RunServer("127.0.0.1:8080")
 	defer closer()
 	c := Demo_NewClient("127.0.0.1:8080")
 	rpcErr := c.SetName("1234")
@@ -61,4 +64,21 @@ func runTestNoServer() {
 	_, rpcErr := c.GetName()
 	udwTest.Ok(rpcErr != nil)
 	udwTest.Ok(rpcErr.IsNetworkError() == true)
+}
+func runTestWrongServer() {
+	closerFn1 := udwNet.RunTCPServerListenAddr("127.0.0.1:8082", func(conn net.Conn) {
+		conn.Write([]byte{0, 0, 0})
+		conn.Close()
+	})
+	c := Demo_NewClient("127.0.0.1:8082")
+	rpcErr := c.IncreaseInt()
+	udwTest.Ok(rpcErr != nil)
+	udwTest.Ok(rpcErr.IsNetworkError() == true)
+	closerFn1()
+	closer := Demo_RunServer("127.0.0.1:8082")
+	defer closer()
+	rpcErr = c.IncreaseInt()
+	if rpcErr != nil {
+		panic("runTestWrongServer " + rpcErr.Error())
+	}
 }

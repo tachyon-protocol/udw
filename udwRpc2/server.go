@@ -34,10 +34,9 @@ func NewServerHub(req ServerReq) *ServerHub {
 		conn2.conn = conn
 		for {
 			conn2.conn.SetDeadline(time.Now().Add(req.MaxIdleTime))
-
 			errMsg := conn2.rb.ReadArrayStart()
 			if errMsg != "" {
-				fmt.Println("dt883f58d6")
+				fmt.Println("dt883f58d6", errMsg)
 				conn2.Close()
 				return
 			}
@@ -49,12 +48,10 @@ func NewServerHub(req ServerReq) *ServerHub {
 				req.Handler(ctx)
 			})
 			if errMsg != "" {
-				fmt.Println("det9aufaz4 ", errMsg)
-				ctx.CloseConn()
+				fmt.Println("det9aufaz4", errMsg)
+				ctx.Close()
 				return
 			}
-			ctx.Close()
-
 		}
 	})
 	sh.closer.AddOnClose(closerFn)

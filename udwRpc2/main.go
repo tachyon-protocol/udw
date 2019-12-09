@@ -2,7 +2,6 @@ package udwRpc2
 
 import (
 	"github.com/tachyon-protocol/udw/udwClose"
-	"github.com/tachyon-protocol/udw/udwErr"
 	"github.com/tachyon-protocol/udw/udwNet"
 	"github.com/tachyon-protocol/udw/udwShm"
 	"net"
@@ -18,12 +17,13 @@ type Conn struct {
 }
 
 func (conn *Conn) Close() {
-	conn.conn.Close()
+	conn.closer.CloseWithCallback(func() {
+		conn.conn.Close()
+	})
 }
 
 type ReqCtx struct {
-	conn   *Conn
-	closer udwClose.Closer
+	conn *Conn
 }
 
 func (ctx *ReqCtx) GetWriter() *udwShm.ShmWriter {
@@ -37,15 +37,6 @@ func (ctx *ReqCtx) GetPeerIp() string {
 	return ip
 }
 
-func (ctx *ReqCtx) Close() (errMsg string) {
-	errMsg = ctx.conn.wb.Flush()
-	ctx.closer.Close()
-	return errMsg
-}
-
-func (ctx *ReqCtx) CloseConn() (errMsg string) {
-	errMsgList := udwErr.ErrmsgList{}
-	errMsgList.AddErrMsg(ctx.Close())
+func (ctx *ReqCtx) Close() {
 	ctx.conn.Close()
-	return errMsgList.GetErrMsg()
 }

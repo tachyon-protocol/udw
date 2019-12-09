@@ -28,7 +28,6 @@ func BuildAndTest() {
 		DisableGenServer: true,
 	})
 	udwCmd.MustRun("go run github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Tester/udwRpc2DemoClient")
-
 }
 
 func getRpcService() udwRpc2Builder.RpcService {

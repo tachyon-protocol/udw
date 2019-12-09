@@ -17,9 +17,10 @@ const sshCmdPrefix = "ssh" + SshOption
 const ScpCmdPrefix = "scp" + SshOption
 
 type RemoteServer struct {
-	Ip       string
-	Port     int
-	UserName string
+	Ip                string
+	Port              int
+	UserName          string
+	ClientKeyFilePath string
 
 	Password    string
 	CertContent string
@@ -39,6 +40,9 @@ func (r RemoteServer) String() string {
 	}
 	seg := []string{}
 	portFlag := "-p"
+	if r.ClientKeyFilePath != "" {
+		seg = append(seg, "-i "+r.ClientKeyFilePath)
+	}
 	if r.IsScp {
 		portFlag = "-P"
 	}
