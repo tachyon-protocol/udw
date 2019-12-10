@@ -13,7 +13,7 @@ func BuildAndTest() {
 		FromObjName:    "Server",
 		TargetPkgPath:  "github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Tester/udwRpc2Demo",
 		Prefix:         "Demo",
-		TargetFilePath: "src/github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Tester/udwRpc2Demo/zzzig_Demo.go",
+		TargetFilePath: "src/github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Tester/udwRpc2Demo/rpc_Demo.go",
 		GoFmt:          true,
 	})
 
@@ -23,7 +23,7 @@ func BuildAndTest() {
 		FromObjName:      "Server",
 		TargetPkgPath:    "main",
 		Prefix:           "D2",
-		TargetFilePath:   "src/github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Tester/udwRpc2DemoClient/zzzig_D2.go",
+		TargetFilePath:   "src/github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Tester/udwRpc2DemoClient/rpc_D2.go",
 		GoFmt:            true,
 		DisableGenServer: true,
 	})
