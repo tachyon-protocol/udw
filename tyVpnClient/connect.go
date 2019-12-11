@@ -37,6 +37,12 @@ func (c *Client) connect() error {
 	c.connLock.Lock()
 	c.directVpnConn = vpnConn
 	c.connLock.Unlock()
+	c.closer.AddOnClose(func(){
+		c.connLock.Lock()
+		directVpnConn:=c.directVpnConn
+		c.connLock.Unlock()
+		directVpnConn.Close()
+	})
 	serverType := "DIRECT"
 	if c.req.IsRelay {
 		serverType = "RELAY"
@@ -133,12 +139,21 @@ func (c *Client) connect() error {
 	c.connLock.Lock()
 	c.vpnConn = vpnConn
 	c.connLock.Unlock()
+	c.closer.AddOnClose(func(){
+		c.connLock.Lock()
+		vpnConn:=c.vpnConn
+		c.connLock.Unlock()
+		vpnConn.Close()
+	})
 	return nil
 }
 
-func (c *Client) keepAliveThread() {
+func (c *Client) initKeepAliveThread() {
 	c.keepAliveChan = make(chan uint64, 10)
+	c.rcInc()
 	go func() {
+		//defer udwLog.Log("close initKeepAliveThread")
+		defer c.rcDec()
 		i := uint64(0)
 		vpnPacket := &tyVpnProtocol.VpnPacket{
 			Cmd:            tyVpnProtocol.CmdKeepAlive,
@@ -146,7 +161,10 @@ func (c *Client) keepAliveThread() {
 		}
 		bufW := udwBytes.NewBufWriter(nil)
 		const timeout = time.Second * 2
-		time.Sleep(timeout / 2)
+		c.closer.SleepDur(timeout / 2)
+		if c.closer.IsClose(){
+			return
+		}
 		timer := time.NewTimer(timeout)
 		for {
 			bufW.Reset()
@@ -157,6 +175,9 @@ func (c *Client) keepAliveThread() {
 			vpnPacket.Encode(bufW)
 			bufW.WriteLittleEndUint64(i)
 			err := udwBinary.WriteByteSliceWithUint32LenNoAllocV2(directVpnConn, bufW.GetBytes())
+			if c.closer.IsClose(){
+				return
+			}
 			if err != nil {
 				c.reconnect()
 				continue
@@ -169,11 +190,16 @@ func (c *Client) keepAliveThread() {
 			case _i := <-c.keepAliveChan:
 				if _i == i {
 					i++
-					time.Sleep(timeout / 2)
+					c.closer.SleepDur(timeout / 2)
+					if c.closer.IsClose(){
+						return
+					}
 					continue
 				}
 				udwLog.Log("[snc1hhr1ems1q] keepAlive error: i not match, expect", i, "but got", _i)
 				c.reconnect()
+			case <-c.closer.GetCloseChan():
+				return
 			}
 		}
 	}()
@@ -189,6 +215,9 @@ func (c *Client) reconnect() {
 	}
 	c.connLock.Unlock()
 	for {
+		if c.closer.IsClose(){
+			return
+		}
 		udwLog.Log("[ruu1n967nwm] RECONNECT...")
 		err := c.connect()
 		if err != nil {
