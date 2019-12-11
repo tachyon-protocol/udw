@@ -4,24 +4,24 @@ import (
 	"github.com/tachyon-protocol/udw/udwRpc2/udwRpc2Builder"
 )
 
-func UdwBuild() {
+func DsnBuild() {
 	udwRpc2Builder.Generate(udwRpc2Builder.GenerateReq{
 		RpcDefine:        getRpcService(),
 		FromObjName:      "serverRpcObj",
-		FromPkgPath:      "tachyonVpnRouteServer",
-		TargetPkgPath:    "tachyonVpnRouteServer",
+		FromPkgPath:      "github.com/tachyon-protocol/udw/tyVpnRouteServer",
+		TargetPkgPath:    "github.com/tachyon-protocol/udw/tyVpnRouteServer",
 		Prefix:           "Rpc",
-		TargetFilePath:   "src/tachyonVpnRouteServer/rpc.go",
+		TargetFilePath:   "src/github.com/tachyon-protocol/udw/tyVpnRouteServer/rpc.go",
 		GoFmt:            true,
 		DisableGenClient: true,
 	})
 	udwRpc2Builder.Generate(udwRpc2Builder.GenerateReq{
 		RpcDefine:        getRpcService(),
 		FromObjName:      "serverRpcObj",
-		FromPkgPath:      "tachyonVpnRouteServer",
-		TargetPkgPath:    "tachyonVpnRouteServer/tachyonVpnRouteClient",
+		FromPkgPath:      "github.com/tachyon-protocol/udw/tyVpnRouteServer",
+		TargetPkgPath:    "github.com/tachyon-protocol/udw/tyVpnRouteServer/tyVpnRouteClient",
 		Prefix:           "Rpc",
-		TargetFilePath:   "src/tachyonVpnRouteServer/tachyonVpnRouteClient/rpc.go",
+		TargetFilePath:   "src/github.com/tachyon-protocol/udw/tyVpnRouteServer/tyVpnRouteClient/rpc.go",
 		GoFmt:            true,
 		DisableGenServer: true,
 	})
@@ -44,7 +44,7 @@ func getRpcService() udwRpc2Builder.RpcService {
 						Type: udwRpc2Builder.RpcType{
 							Kind:       udwRpc2Builder.RpcTypeKindNamedStruct,
 							StructName: "VpnNode",
-							GoPkg:      "tachyonVpnRouteServer/tachyonVpnRouteClient",
+							GoPkg:      "github.com/tachyon-protocol/udw/tyVpnRouteServer/tyVpnRouteClient",
 						},
 					},
 				},
@@ -65,7 +65,7 @@ func getRpcService() udwRpc2Builder.RpcService {
 							Elem: &udwRpc2Builder.RpcType{
 								Kind:       udwRpc2Builder.RpcTypeKindNamedStruct,
 								StructName: "VpnNode",
-								GoPkg:      "tachyonVpnRouteServer/tachyonVpnRouteClient",
+								GoPkg:      "github.com/tachyon-protocol/udw/tyVpnRouteServer/tyVpnRouteClient",
 							},
 						},
 					},

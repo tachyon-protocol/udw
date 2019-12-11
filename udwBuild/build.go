@@ -124,7 +124,7 @@ func main(){
 
 			aliasPkgName := filepath.Base(pkgPath) + "_" + strconv.Itoa(i)
 			goFile.Buf.WriteString(aliasPkgName)
-			goFile.Buf.WriteString(".UdwBuild()\n")
+			goFile.Buf.WriteString(".DsnBuild()\n")
 			goFile.AddImportPathWithAlias(strings.Replace(pkgPath, "\\", "/", -1), aliasPkgName)
 			if debugSubProcessTime {
 				goFile.Buf.WriteString(`println(` + udwGoTypeMarshal.MustWriteObjectToMainPackage(`"mzyzpwbykp after `+pkgPath) + `,time.Since(_startTime).String())` + "\n")
