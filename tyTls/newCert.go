@@ -12,7 +12,14 @@ import (
 	"time"
 )
 
-func NewTlsCert(isClient bool) (cert tls.Certificate) {
+type NewTlsCertResp struct{
+	TlsCert tls.Certificate
+	CertPem string
+	PkPem string
+}
+
+// can not crash by user
+func MustNewTlsCert(isClient bool) (resp NewTlsCertResp) {
 	var ExtKeyUsage x509.ExtKeyUsage
 	if isClient {
 		ExtKeyUsage = x509.ExtKeyUsageClientAuth
@@ -43,21 +50,30 @@ func NewTlsCert(isClient bool) (cert tls.Certificate) {
 	if err != nil {
 		panic(err)
 	}
-	certPem := pem.EncodeToMemory(&pem.Block{
+	resp.CertPem = string(pem.EncodeToMemory(&pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: derBytes,
-	})
+	}))
 	b, err := x509.MarshalECPrivateKey(priv)
 	if err != nil {
 		panic(err)
 	}
-	privPem := pem.EncodeToMemory(&pem.Block{
+	resp.PkPem = string(pem.EncodeToMemory(&pem.Block{
 		Type:  "EC PRIVATE KEY",
 		Bytes: b,
-	})
-	cert, err = tls.X509KeyPair(certPem, privPem)
+	}))
+	tlsCert,err:=tls.X509KeyPair([]byte(resp.CertPem), []byte(resp.PkPem))
 	if err != nil {
 		panic(err)
 	}
-	return cert
+	resp.TlsCert = tlsCert
+	return resp
 }
+
+func MustNewTlsCertSimple(isClient bool) (cert tls.Certificate) {
+	resp:= MustNewTlsCert(isClient)
+	return resp.TlsCert
+}
+
+
+

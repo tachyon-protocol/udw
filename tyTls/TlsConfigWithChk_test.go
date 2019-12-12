@@ -9,10 +9,10 @@ import (
 
 func TestTlsConfigWithChk(ot *testing.T) {
 	EnableTlsVersion13()
-	certS := NewTlsCert(false)
+	certS := MustNewTlsCertSimple(false)
 	ServerChk := HashChk(certS.Certificate[0])
 	//fmt.Println("ServerChk",ServerChk)
-	certC := NewTlsCert(true)
+	certC := MustNewTlsCertSimple(true)
 	ClientChk := HashChk(certC.Certificate[0])
 	//fmt.Println("ClientChk",ClientChk)
 	{

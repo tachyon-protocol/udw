@@ -17,23 +17,30 @@ import (
 	"github.com/tachyon-protocol/udw/udwNet"
 	"github.com/tachyon-protocol/udw/udwNet/udwTapTun"
 	"github.com/tachyon-protocol/udw/udwStrings"
-	"github.com/tachyon-protocol/udw/udwTlsSelfSignCertV2"
 	"net"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+	"github.com/tachyon-protocol/udw/udwJson"
+	"github.com/tachyon-protocol/udw/tyVpnClient"
 )
+
+func RunCmd(req ServerRunReq){
+	server := &Server{}
+	server.Run(req)
+}
 
 type ServerRunReq struct {
 	UseRelay        bool
 	RelayServerIp   string
 	RelayServerTKey string
 	RelayServerChk  string
-
 	SelfTKey                   string
+	NoNeedSelfTKey bool
 	BlockCountryCodeListS      string // empty string do not block any country code, look like "KP,IR,RU"
-	DisableRegisterRouteServer bool
+	SelfIp string
+	RegisterToRouteServer bool
 }
 
 type Server struct {
@@ -51,11 +58,12 @@ type Server struct {
 	blockCountryCodeList []string
 }
 
-func (s *Server) Run(req ServerRunReq) {
+func (s *Server) Run(config ServerRunReq) {
 	tyTls.EnableTlsVersion13()
-	s.req = req
+	s.req = config
 	s.clientId = tyVpnProtocol.GetClientId(0)
 	fmt.Println("ClientId:", s.clientId)
+
 	tun, err := udwTapTun.NewTun("")
 	udwErr.PanicIfError(err)
 	err = udwTapTun.SetP2PIpAndUp(udwTapTun.SetP2PIpRequest{
@@ -68,23 +76,38 @@ func (s *Server) Run(req ServerRunReq) {
 	udwErr.PanicIfError(err)
 	s.tun = tun
 	networkConfig()
-	tlsServerCert := udwTlsSelfSignCertV2.GetTlsCertificate()
+	serverStorageInfo:=getServerStorageInfo()
+	if s.req.SelfTKey=="" && s.req.NoNeedSelfTKey==false{
+		s.req.SelfTKey = serverStorageInfo.SelfTKey
+	}
+	routeC := tyVpnRouteClient.Rpc_NewClient(tyVpnProtocol.PublicRouteServerAddr)
+	if s.req.SelfIp==""{
+		ip,rpcErr := routeC.GetIp()
+		if rpcErr!=nil{
+			panic(rpcErr.Error())
+		}
+		s.req.SelfIp = ip
+	}
 	sTlsConfig, errMsg := tyTls.NewServerTlsConfigWithChk(tyTls.NewServerTlsConfigWithChkReq{
-		ServerCert: *tlsServerCert,
+		ServerCert: *serverStorageInfo.ServerTlsCert,
 	})
 	udwErr.PanicIfErrorMsg(errMsg)
-	serverChk := tyTls.MustHashChkFromTlsCert(tlsServerCert)
-	fmt.Println("ServerChk: " + serverChk)
+	//fmt.Println("ServerChk: " + serverStorageInfo.ServerChk)
+	clientConnectConfigS:=udwJson.MustMarshalToString(tyVpnClient.Config{
+		ServerIp: s.req.SelfIp,
+		ServerChk: serverStorageInfo.ServerChk,
+		ServerTKey: s.req.SelfTKey,
+	})
+	fmt.Println("ServerConnectKey: "+clientConnectConfigS)
 	fmt.Println("Server started ✔")
 	if s.req.BlockCountryCodeListS != "" {
 		s.blockCountryCodeList = strings.Split(s.req.BlockCountryCodeListS, ",")
 	}
-	if s.req.DisableRegisterRouteServer == false {
+	if s.req.RegisterToRouteServer {
 		go func() {
-			c := tyVpnRouteClient.Rpc_NewClient(tyVpnProtocol.PublicRouteServerAddr)
 			for {
-				err1, err2 := c.VpnNodeRegister(tyVpnRouteClient.VpnNode{
-					ServerChk: serverChk,
+				err1, err2 := routeC.VpnNodeRegister(tyVpnRouteClient.VpnNode{
+					ServerChk: serverStorageInfo.ServerChk,
 				})
 				if err1 != "" {
 					udwLog.Log("4etc1ghe1khj " + err1)
@@ -147,7 +170,7 @@ func (s *Server) Run(req ServerRunReq) {
 	}()
 	closer := udwClose.NewCloser()
 	//two methods to accept new vpn conn
-	if req.UseRelay {
+	if s.req.UseRelay {
 		err := s.connectToRelay()
 		udwErr.PanicIfError(err)
 		s.relayConnKeepAliveThread()

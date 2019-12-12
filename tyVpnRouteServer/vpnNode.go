@@ -44,6 +44,10 @@ func (serverRpcObj) VpnNodeList() []tyVpnRouteClient.VpnNode {
 
 func (serverRpcObj) Ping() {}
 
+func (serverRpcObj) GetIp(ipObj udwRpc2.PeerIp) string{
+	return ipObj.Ip
+}
+
 func initGcVpnNode() {
 	go func() {
 		for {

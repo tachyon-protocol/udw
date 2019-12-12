@@ -68,6 +68,23 @@ func Rpc_RunServer(addr string) (closer func()) {
 					if errMsg != "" {
 						return
 					}
+				case 4:
+					tmp_5 := udwRpc2.PeerIp{ctx.GetPeerIp()}
+					errMsg = ctx.GetReader().ReadArrayEnd()
+					if errMsg != "" {
+						return
+					}
+					tmp_6 := s.GetIp(tmp_5)
+					ctx.GetWriter().WriteString("")
+					errMsg = ctx.GetWriter().WriteValue(tmp_6)
+					if errMsg != "" {
+						return
+					}
+					ctx.GetWriter().WriteArrayEnd()
+					errMsg = ctx.GetWriter().Flush()
+					if errMsg != "" {
+						return
+					}
 				default:
 				}
 			})

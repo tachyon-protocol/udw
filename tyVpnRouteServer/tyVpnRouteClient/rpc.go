@@ -138,3 +138,45 @@ func (c *Rpc_Client) Ping() (RpcErr *udwRpc2.RpcError) {
 	}
 	return
 }
+func (c *Rpc_Client) GetIp() (fo1 string, RpcErr *udwRpc2.RpcError) {
+	_networkErr := c.ch.RequestCb(func(ctx *udwRpc2.ReqCtx) {
+		ctx.GetWriter().WriteUvarint(4)
+		ctx.GetWriter().WriteArrayEnd()
+		errMsg := ctx.GetWriter().Flush()
+		if errMsg != "" {
+			RpcErr = udwRpc2.NewNetworkError("dehqx82rjj " + errMsg)
+			ctx.Close()
+			return
+		}
+		var s string
+		errMsg = ctx.GetReader().ReadValue(&s)
+		if errMsg != "" {
+			RpcErr = udwRpc2.NewNetworkError("ehtjkea4re " + errMsg)
+			ctx.Close()
+			return
+		}
+		if s != "" {
+			RpcErr = udwRpc2.NewOtherError(s)
+			ctx.GetReader().ReadArrayEnd()
+			return
+		}
+		errMsg = ctx.GetReader().ReadValue(&fo1)
+		if errMsg != "" {
+			RpcErr = udwRpc2.NewNetworkError("kvkdcgtnk2 " + errMsg)
+			ctx.Close()
+			return
+		}
+		errMsg = ctx.GetReader().ReadArrayEnd()
+		if errMsg != "" {
+			RpcErr = udwRpc2.NewNetworkError("4b7rug5mf2 " + errMsg)
+			ctx.Close()
+			return
+		}
+		RpcErr = nil
+		return
+	})
+	if _networkErr != "" {
+		RpcErr = udwRpc2.NewNetworkError("494fehebw6 " + _networkErr)
+	}
+	return
+}

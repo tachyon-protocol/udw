@@ -74,6 +74,25 @@ func getRpcService() udwRpc2Builder.RpcService {
 			{
 				Name: "Ping",
 			},
+			{
+				Name: "GetIp",
+				InputParameterList: []udwRpc2Builder.RpcParameter{
+					{
+						Type: udwRpc2Builder.RpcType{
+							Kind:       udwRpc2Builder.RpcTypeKindNamedStruct,
+							StructName: "PeerIp",
+							GoPkg:      "github.com/tachyon-protocol/udw/udwRpc2",
+						},
+					},
+				},
+				OutputParameterList: []udwRpc2Builder.RpcParameter{
+					{
+						Type: udwRpc2Builder.RpcType{
+							Kind: udwRpc2Builder.RpcTypeKindString,
+						},
+					},
+				},
+			},
 		},
 	}
 }

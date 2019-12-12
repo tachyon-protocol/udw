@@ -25,20 +25,20 @@ import (
 	"github.com/tachyon-protocol/udw/udwClose"
 )
 
-type RunReq struct {
-	ServerIp   string
-	ServerTKey string
+type Config struct {
+	ServerIp   string `json:",omitempty"`
+	ServerTKey string `json:",omitempty"`
 
-	IsRelay            bool
-	ExitServerClientId uint64 //required when IsRelay is true
-	ExitServerTKey     string //required when IsRelay is true
+	IsRelay            bool `json:",omitempty"`
+	ExitServerClientId uint64 `json:",omitempty"` //required when IsRelay is true
+	ExitServerTKey     string `json:",omitempty"` //required when IsRelay is true
 
-	ServerChk                   string // if it is "", it will use InsecureSkipVerify
-	DisableUsePublicRouteServer bool
+	ServerChk                   string `json:",omitempty"` // if it is "", it will use InsecureSkipVerify
+	DisableUsePublicRouteServer bool `json:",omitempty"`
 }
 
 type Client struct {
-	req                  RunReq
+	req                  Config
 	clientId             uint64
 	clientIdToExitServer uint64
 	keepAliveChan        chan uint64
@@ -51,10 +51,10 @@ type Client struct {
 	closer               udwClose.Closer
 	rc                   int
 	rcLocker             sync.Mutex
-	rcWg sync.WaitGroup
+	rcWg                 sync.WaitGroup
 }
 
-func (c *Client) connectL1(req RunReq) {
+func (c *Client) connectL1(req Config) {
 	//defer udwLog.Log("close connectL1")
 	defer c.rcDec()
 	c.req = req

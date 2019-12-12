@@ -7,8 +7,8 @@ import (
 	"github.com/tachyon-protocol/udw/udwLog"
 )
 
-func CmdRun(req RunReq){
-	SetConfig(req)
+func CmdRun(req Config){
+	SetConfig(&req)
 	SetOnChangeCallback("cmd",func(){
 		udwLog.Log("SetOnChangeCallback",GetVpnStatus(),GetLastError())
 	})
@@ -139,21 +139,7 @@ func GetLastError() string{
 	return s
 }
 
-func SetConfig(config RunReq){
-	gConfigLocker.Lock()
-	gConfig = config
-	gConfigLocker.Unlock()
-}
 
-var gConfig RunReq
-var gConfigLocker sync.RWMutex
-
-func getConfig() RunReq{
-	gConfigLocker.RLock()
-	thisConfig:=gConfig
-	gConfigLocker.RUnlock()
-	return thisConfig
-}
 
 const (
 	innerCsDisconnected = "Disconnected"
