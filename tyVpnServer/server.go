@@ -236,6 +236,7 @@ func (s *Server) clientTcpConnHandle(connToClient net.Conn) {
 			if s.req.SelfTKey == "" {
 				s.newOrUpdateClientFromDirectConn(vpnPacket.ClientIdSender, connToClient)
 				udwLog.Log("[4z734vc9pn] New client sent handshake ✔ server not require TKey", connToClient.RemoteAddr())
+
 			} else if len(s.req.SelfTKey) == len(string(vpnPacket.Data)) && s.req.SelfTKey == string(vpnPacket.Data) {
 				s.newOrUpdateClientFromDirectConn(vpnPacket.ClientIdSender, connToClient)
 				udwLog.Log("[agz7rzq1kr9] New client TKey matched ✔", connToClient.RemoteAddr())

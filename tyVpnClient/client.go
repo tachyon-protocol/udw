@@ -54,21 +54,40 @@ type Client struct {
 	rcWg                 sync.WaitGroup
 }
 
-func (c *Client) connectL1(req Config) {
-	//defer udwLog.Log("close connectL1")
-	defer c.rcDec()
-	c.req = req
-	//udwLog.Log("connectL1 1",c.thisCsCmdId)
-	setLastError("")
+func (c *Client) initObj() (errMsg string){
 	tyTls.EnableTlsVersion13()
 	c.clientId = tyVpnProtocol.GetClientId(0)
 	c.clientIdToExitServer = c.clientId
 	if c.req.IsRelay {
 		c.clientIdToExitServer = tyVpnProtocol.GetClientId(1)
 		if c.req.ExitServerClientId == 0 {
-			c.errorDurationConnecting("ExitServerClientId can be empty when use relay mode")
-			return
+			return "ExitServerClientId can be empty when use relay mode"
 		}
+	}
+	if c.req.ServerChk == "" {
+		c.tlsConfig = newInsecureClientTlsConfig()
+	} else {
+		var errMsg string
+		c.tlsConfig, errMsg = tyTls.NewClientTlsConfigWithChk(tyTls.NewClientTlsConfigWithChkReq{
+			ServerChk: c.req.ServerChk,
+		})
+		if errMsg!=""{
+			return errMsg
+		}
+	}
+	return ""
+}
+
+func (c *Client) connectL1(req Config) {
+	//defer udwLog.Log("close connectL1")
+	defer c.rcDec()
+	c.req = req
+	//udwLog.Log("connectL1 1",c.thisCsCmdId)
+	setLastError("")
+	errMsg := c.initObj()
+	if errMsg!=""{
+		c.errorDurationConnecting(errMsg)
+		return
 	}
 	if c.closer.IsClose(){
 		return
@@ -89,19 +108,6 @@ func (c *Client) connectL1(req Config) {
 	c.closer.AddOnClose(func(){
 		c.tun.Close()
 	})
-	//err = c.connect()
-	if c.req.ServerChk == "" {
-		c.tlsConfig = newInsecureClientTlsConfig()
-	} else {
-		var errMsg string
-		c.tlsConfig, errMsg = tyTls.NewClientTlsConfigWithChk(tyTls.NewClientTlsConfigWithChkReq{
-			ServerChk: c.req.ServerChk,
-		})
-		if errMsg!=""{
-			c.errorDurationConnecting(errMsg)
-			return
-		}
-	}
 	if c.closer.IsClose(){
 		return
 	}

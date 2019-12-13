@@ -50,9 +50,15 @@ func (c *Client) connect() error {
 			connRelaySide, plain = tyVpnProtocol.NewInternalConnectionDual(nil, nil)
 			relayConn            = vpnConn
 		)
+		c.closer.AddOnClose(func() {
+			connRelaySide.Close()
+			plain.Close()
+		})
 		vpnConn = tls.Client(plain, c.tlsConfig)
+		c.rcInc()
 		//read from relay conn, write to vpn conn
 		go func() {
+			defer c.rcDec()
 			var (
 				buf       = udwBytes.NewBufWriter(nil)
 				vpnPacket = &tyVpnProtocol.VpnPacket{}
@@ -60,6 +66,9 @@ func (c *Client) connect() error {
 			for {
 				buf.Reset()
 				err := udwBinary.ReadByteSliceWithUint32LenToBufW(relayConn, buf)
+				if c.closer.IsClose(){
+					return
+				}
 				if err != nil {
 					udwLog.Log("[wua1j5ps1pam] close 3 connections", err)
 					_ = connRelaySide.Close()
@@ -92,8 +101,10 @@ func (c *Client) connect() error {
 				}
 			}
 		}()
+		c.rcInc()
 		//read from vpn conn, write to relay conn
 		go func() {
+			c.rcDec()
 			vpnPacket := &tyVpnProtocol.VpnPacket{
 				Cmd:              tyVpnProtocol.CmdForward,
 				ClientIdSender:   c.clientId,
@@ -103,6 +114,9 @@ func (c *Client) connect() error {
 			bufW := udwBytes.NewBufWriter(nil)
 			for {
 				n, err := connRelaySide.Read(buf)
+				if c.closer.IsClose(){
+					return
+				}
 				if err != nil {
 					udwLog.Log("[e9erq1bwd1] close 3 connections", err)
 					_ = connRelaySide.Close()
