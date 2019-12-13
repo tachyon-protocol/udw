@@ -62,7 +62,7 @@ func (s *Server) Run(config ServerRunReq) {
 	tyTls.EnableTlsVersion13()
 	s.req = config
 	s.clientId = tyVpnProtocol.GetClientId(0)
-	fmt.Println("ClientId:", s.clientId)
+	fmt.Println("ClientId:", s.clientId,"ProtocolVersion: ",tyVpnProtocol.Version)
 
 	tun, err := udwTapTun.NewTun("")
 	udwErr.PanicIfError(err)
@@ -220,29 +220,51 @@ func (s *Server) clientTcpConnHandle(connToClient net.Conn) {
 			_ = connToClient.Close()
 			return
 		}
-		switch vpnPacket.Cmd {
-		case tyVpnProtocol.CmdPing, tyVpnProtocol.CmdKeepAlive:
+		writePacketFn:=func(cmd byte,data []byte) (err error){
 			bufW.Reset()
+			vpnPacket.Cmd = cmd
 			vpnPacket.ClientIdReceiver = vpnPacket.ClientIdSender
 			vpnPacket.ClientIdSender = s.clientId
+			vpnPacket.Data = data
 			vpnPacket.Encode(bufW)
-			err := udwBinary.WriteByteSliceWithUint32LenNoAllocV2(connToClient, bufW.GetBytes())
-			if err != nil {
+			err = udwBinary.WriteByteSliceWithUint32LenNoAllocV2(connToClient, bufW.GetBytes())
+			return err
+		}
+		switch vpnPacket.Cmd {
+		case tyVpnProtocol.CmdPing, tyVpnProtocol.CmdKeepAlive:
+			err:=writePacketFn(vpnPacket.Cmd,vpnPacket.Data)
+			if err!=nil{
 				udwLog.Log("[2cpj1sbv37s] close conn", err)
 				_ = connToClient.Close()
 				return
 			}
 		case tyVpnProtocol.CmdHandshake:
+			isOk:=false
 			if s.req.SelfTKey == "" {
-				s.newOrUpdateClientFromDirectConn(vpnPacket.ClientIdSender, connToClient)
 				udwLog.Log("[4z734vc9pn] New client sent handshake ✔ server not require TKey", connToClient.RemoteAddr())
-
-			} else if len(s.req.SelfTKey) == len(string(vpnPacket.Data)) && s.req.SelfTKey == string(vpnPacket.Data) {
-				s.newOrUpdateClientFromDirectConn(vpnPacket.ClientIdSender, connToClient)
+				isOk = true
+			}else if len(s.req.SelfTKey) == len(string(vpnPacket.Data)) && s.req.SelfTKey == string(vpnPacket.Data) {
 				udwLog.Log("[agz7rzq1kr9] New client TKey matched ✔", connToClient.RemoteAddr())
-			} else {
-				_ = connToClient.Close()
+				isOk = true
+			}else {
 				udwLog.Log("[wzh56ty1bur] New client TKey not match ✘ close conn", connToClient.RemoteAddr())
+				isOk = false
+			}
+			if isOk{
+				s.newOrUpdateClientFromDirectConn(vpnPacket.ClientIdSender, connToClient)
+				err:=writePacketFn(tyVpnProtocol.CmdErr,nil)
+				if err!=nil{
+					udwLog.Log("[n4wbkq9q68] close conn", err)
+					_ = connToClient.Close()
+					return
+				}
+			} else {
+				err:=writePacketFn(tyVpnProtocol.CmdErr,[]byte("tegryjenqb TKey not match"))
+				if err!=nil{
+					udwLog.Log("[fsegxt36f4] close conn", err)
+					return
+				}
+				_ = connToClient.Close()
 			}
 		case tyVpnProtocol.CmdData:
 			client := s.getClient(vpnPacket.ClientIdSender)
@@ -292,3 +314,4 @@ func (s *Server) clientTcpConnHandle(connToClient net.Conn) {
 		}
 	}
 }
+

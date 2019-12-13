@@ -2,7 +2,6 @@ package tyVpnServer
 
 import (
 	"crypto/tls"
-	"encoding/binary"
 	"errors"
 	"github.com/tachyon-protocol/udw/tyVpnProtocol"
 	"github.com/tachyon-protocol/udw/udwBinary"
@@ -75,7 +74,12 @@ func (s *Server) connectToRelay() error {
 					udwLog.Log("[vw9tm9rv2s] not forward to self", vpnPacket.ClientIdSender, "->", vpnPacket.ClientIdReceiver)
 				}
 			case tyVpnProtocol.CmdKeepAlive:
-				s.relayConnKeepAliveChan <- binary.LittleEndian.Uint64(vpnPacket.Data)
+				i,ok:=vpnPacket.GetDataLittleEndianUint64()
+				if !ok{
+					udwLog.Log("[kzge4b9thc]", len(vpnPacket.Data))
+					continue
+				}
+				s.relayConnKeepAliveChan <- i
 			default:
 				udwLog.Log("[d39e7d859m] Unexpected Cmd[", vpnPacket.Cmd, "]")
 			}

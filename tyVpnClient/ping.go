@@ -41,7 +41,7 @@ func Ping(req PingReq) error {
 	conn = tls.Client(conn, tlsConfig)
 	var (
 		pingPacket = tyVpnProtocol.VpnPacket{
-			Cmd: tyVpnProtocol.CmdPing,
+			Cmd: tyVpnProtocol.CmdKeepAlive,
 		}
 		buf = udwBytes.NewBufWriter(nil)
 	)
@@ -64,6 +64,9 @@ func Ping(req PingReq) error {
 		err = pingPacket.Decode(buf.GetBytes())
 		if err != nil {
 			return err
+		}
+		if pingPacket.Cmd!=tyVpnProtocol.CmdKeepAlive{
+			return errors.New("tvhfx76ynx")
 		}
 		if req.DebugLog {
 			udwLog.Log("<- ✔", time.Now().Sub(start))

@@ -2,24 +2,34 @@ package tyVpnClient
 
 import (
 	"crypto/tls"
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"github.com/tachyon-protocol/udw/tyVpnProtocol"
 	"github.com/tachyon-protocol/udw/udwBinary"
 	"github.com/tachyon-protocol/udw/udwBytes"
 	"github.com/tachyon-protocol/udw/udwLog"
-	"net"
 	"strconv"
 	"time"
+	"github.com/tachyon-protocol/udw/udwClose"
+	"github.com/tachyon-protocol/udw/udwNet"
 )
 
 func (c *Client) connect() error {
-	vpnConn, err := net.Dial("tcp", c.req.ServerIp+":"+strconv.Itoa(tyVpnProtocol.VpnPort))
+	reconnectCloser :=udwClose.NewCloser()
+	c.connLock.Lock()
+	c.reconnectCloser = reconnectCloser
+	c.connLock.Unlock()
+	const timeout = 15*time.Second
+	deadline:=time.Now().Add(timeout)
+	vpnConn,err:=udwNet.NewRetractableNetDial(reconnectCloser,timeout)("tcp",c.req.ServerIp+":"+strconv.Itoa(tyVpnProtocol.VpnPort))
+	if reconnectCloser.IsClose(){
+		return nil
+	}
 	if err != nil {
 		return errors.New("[w7syh9d1zgd] " + err.Error())
 	}
 	vpnConn = tls.Client(vpnConn, c.tlsConfig)
+	vpnConn.SetDeadline(deadline)
 	var (
 		handshakeVpnPacket = tyVpnProtocol.VpnPacket{
 			Cmd:            tyVpnProtocol.CmdHandshake,
@@ -34,15 +44,36 @@ func (c *Client) connect() error {
 		_ = vpnConn.Close()
 		return errors.New("[52y73b9e89] " + err.Error())
 	}
+	buf := &udwBytes.BufWriter{}
+	err = udwBinary.ReadByteSliceWithUint32LenToBufW(vpnConn, buf)
+	if reconnectCloser.IsClose(){
+		return errors.New("nj858ts2xa")
+	}
+	if err != nil {
+		udwLog.Log("[6h2x3sq9yv]", err)
+		_ = vpnConn.Close()
+		return err
+	}
+	err = handshakeVpnPacket.Decode(buf.GetBytes())
+	if err != nil {
+		udwLog.Log("[z2uet8s4uq]", err)
+		_ = vpnConn.Close()
+		return err
+	}
+	if handshakeVpnPacket.Cmd!=tyVpnProtocol.CmdErr{
+		errMsg:="[f56rktm322] "+strconv.Itoa(int(handshakeVpnPacket.Cmd))
+		udwLog.Log(errMsg)
+		return errors.New(errMsg)
+	}
+	if len(handshakeVpnPacket.Data)>0{
+		errMsg:="[7f6rgeqhz2] "+string(handshakeVpnPacket.Data)
+		udwLog.Log(errMsg)
+		return errors.New(errMsg)
+	}
+	vpnConn.SetDeadline(time.Time{})
 	c.connLock.Lock()
 	c.directVpnConn = vpnConn
 	c.connLock.Unlock()
-	c.closer.AddOnClose(func(){
-		c.connLock.Lock()
-		directVpnConn:=c.directVpnConn
-		c.connLock.Unlock()
-		directVpnConn.Close()
-	})
 	serverType := "DIRECT"
 	if c.req.IsRelay {
 		serverType = "RELAY"
@@ -60,7 +91,7 @@ func (c *Client) connect() error {
 		go func() {
 			defer c.rcDec()
 			var (
-				buf       = udwBytes.NewBufWriter(nil)
+				buf       = &udwBytes.BufWriter{}
 				vpnPacket = &tyVpnProtocol.VpnPacket{}
 			)
 			for {
@@ -95,7 +126,16 @@ func (c *Client) connect() error {
 						return
 					}
 				case tyVpnProtocol.CmdKeepAlive:
-					c.keepAliveChan <- binary.LittleEndian.Uint64(vpnPacket.Data)
+					i,ok:=vpnPacket.GetDataLittleEndianUint64()
+					if !ok{
+						udwLog.Log("peavbu56eh", len(vpnPacket.Data))
+						continue
+					}
+					select {
+						case c.keepAliveChan <- i:
+						default:
+						continue
+					}
 				default:
 					fmt.Println("[a3t7vfh1ms] Unexpected Cmd[", vpnPacket.Cmd, "]")
 				}
@@ -149,16 +189,10 @@ func (c *Client) connect() error {
 		}
 		udwLog.Log("sent handshake to ExitServer ✔")
 	}
-	fmt.Println("Connected to", serverType, "Server ✔")
+	fmt.Println("Connected to", serverType, "Server ✔","ProtocolVersion: ",tyVpnProtocol.Version)
 	c.connLock.Lock()
 	c.vpnConn = vpnConn
 	c.connLock.Unlock()
-	c.closer.AddOnClose(func(){
-		c.connLock.Lock()
-		vpnConn:=c.vpnConn
-		c.connLock.Unlock()
-		vpnConn.Close()
-	})
 	return nil
 }
 
@@ -193,14 +227,14 @@ func (c *Client) initKeepAliveThread() {
 				return
 			}
 			if err != nil {
-				c.reconnect()
+				c.reconnect(true)
 				continue
 			}
 			timer.Reset(timeout)
 			select {
 			case <-timer.C:
 				udwLog.Log("[snc1hhr1ems1q] keepAlive timeout", i)
-				c.reconnect()
+				c.reconnect(true)
 			case _i := <-c.keepAliveChan:
 				if _i == i {
 					i++
@@ -211,7 +245,7 @@ func (c *Client) initKeepAliveThread() {
 					continue
 				}
 				udwLog.Log("[snc1hhr1ems1q] keepAlive error: i not match, expect", i, "but got", _i)
-				c.reconnect()
+				c.reconnect(true)
 			case <-c.closer.GetCloseChan():
 				return
 			}
@@ -219,7 +253,9 @@ func (c *Client) initKeepAliveThread() {
 	}()
 }
 
-func (c *Client) reconnect() {
+func (c *Client) reconnect(isForeverRetry bool) (err error) {
+	c.reconnectProcLocker.Lock()
+	defer c.reconnectProcLocker.Unlock()
 	c.connLock.Lock()
 	if c.vpnConn != nil {
 		_ = c.vpnConn.Close()
@@ -230,16 +266,36 @@ func (c *Client) reconnect() {
 	c.connLock.Unlock()
 	for {
 		if c.closer.IsClose(){
-			return
+			return nil
 		}
 		udwLog.Log("[ruu1n967nwm] RECONNECT...")
 		err := c.connect()
 		if err != nil {
 			udwLog.Log("[ruu1n967nwm] RECONNECT Failed", err)
-			time.Sleep(time.Millisecond * 500)
+			if isForeverRetry ==false{
+				return err
+			}
+			c.closer.SleepDur(time.Millisecond * 500)
 			continue
 		}
 		udwLog.Log("[ruu1n967nwm] RECONNECT Succeed ✔")
-		return
+		return nil
+	}
+}
+
+func (c *Client) closeReconnect(){
+	c.connLock.Lock()
+	conn1:=c.vpnConn
+	conn2:=c.directVpnConn
+	closer:=c.reconnectCloser
+	c.connLock.Unlock()
+	if conn1!=nil{
+		conn1.Close()
+	}
+	if conn2!=nil{
+		conn2.Close()
+	}
+	if closer!=nil{
+		closer.Close()
 	}
 }

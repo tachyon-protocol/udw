@@ -6,6 +6,7 @@ import (
 	"github.com/tachyon-protocol/udw/udwRand"
 	"github.com/tachyon-protocol/udw/udwStrconv"
 	"strconv"
+	"encoding/binary"
 )
 
 const Debug = false
@@ -21,6 +22,7 @@ const (
 )
 
 const VpnPort = 29444
+const Version = 2
 
 const (
 	CmdData      byte = 1
@@ -28,6 +30,7 @@ const (
 	CmdHandshake byte = 3
 	CmdPing      byte = 4
 	CmdKeepAlive byte = 5
+	CmdErr       byte = 6
 )
 
 const PublicRouteServerAddr = "35.223.105.46:24587"
@@ -44,6 +47,14 @@ func (packet *VpnPacket) Reset() {
 	packet.ClientIdSender = 0
 	packet.ClientIdReceiver = 0
 	packet.Data = packet.Data[:0]
+}
+
+func (packet *VpnPacket) GetDataLittleEndianUint64() (uint64,bool){
+	if len(packet.Data)<8{
+		return 0,false
+	}
+	i:=binary.LittleEndian.Uint64(packet.Data)
+	return i,true
 }
 
 func GetClientId(index int) uint64 {

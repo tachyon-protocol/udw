@@ -2,7 +2,6 @@ package tyVpnClient
 
 import (
 	"crypto/tls"
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"github.com/tachyon-protocol/udw/tyTls"
@@ -52,6 +51,8 @@ type Client struct {
 	rc                   int
 	rcLocker             sync.Mutex
 	rcWg                 sync.WaitGroup
+	reconnectCloser *udwClose.Closer
+	reconnectProcLocker sync.Mutex
 }
 
 func (c *Client) initObj() (errMsg string){
@@ -111,9 +112,14 @@ func (c *Client) connectL1(req Config) {
 	if c.closer.IsClose(){
 		return
 	}
+	c.closer.AddOnClose(c.closeReconnect)
 	//udwLog.Log("connectL1 5",c.thisCsCmdId)
-	c.reconnect()
+	err = c.reconnect(false)
 	if c.closer.IsClose(){
+		return
+	}
+	if err!=nil{
+		c.errorDurationConnecting(err.Error())
 		return
 	}
 	c.initKeepAliveThread()
@@ -343,7 +349,11 @@ func (c *Client) initConnReadThread() {
 					udwLog.Log("[wmw12fyr9e] TUN Write error", err)
 				}
 			case tyVpnProtocol.CmdKeepAlive:
-				i := binary.LittleEndian.Uint64(vpnPacket.Data)
+				i,ok:=vpnPacket.GetDataLittleEndianUint64()
+				if !ok{
+					udwLog.Log("peavbu56eh", len(vpnPacket.Data))
+					continue
+				}
 				select {
 					case c.keepAliveChan <- i:
 					default:
