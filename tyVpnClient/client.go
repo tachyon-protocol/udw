@@ -202,8 +202,7 @@ func (c *Client) tryUseRouteServer() {
 		return
 	}
 	if c.req.DisableUsePublicRouteServer {
-		setLastError("need config ServerIp")
-		c.closer.Close()
+		c.errorDurationConnecting("need config ServerIp")
 		return
 	}
 	//udwLog.Log("connectL1 6",c.thisCsCmdId)
@@ -212,8 +211,7 @@ func (c *Client) tryUseRouteServer() {
 	list, rpcErr := routeC.VpnNodeList()
 	//udwLog.Log("connectL1 8",c.thisCsCmdId)
 	if rpcErr != nil {
-		setLastError(rpcErr.Error())
-		c.closer.Close()
+		c.errorDurationConnecting(rpcErr.Error())
 		return
 	}
 	locker := sync.Mutex{}
@@ -240,8 +238,7 @@ func (c *Client) tryUseRouteServer() {
 	wg.Wait()
 	//udwLog.Log("connectL1 9",c.thisCsCmdId)
 	if fastNode.Ip == "" {
-		setLastError("all ping lost")
-		c.closer.Close()
+		c.errorDurationConnecting("all ping lost")
 		return
 	}
 	c.req.ServerIp = fastNode.Ip
@@ -323,7 +320,7 @@ func (c *Client) initConnReadThread() {
 					_vpnConn := c.vpnConn
 					c.connLock.Unlock()
 					if vpnConn == _vpnConn {
-						time.Sleep(time.Millisecond * 50)
+						c.closer.SleepDur(time.Millisecond * 50)
 					} else {
 						vpnConn = _vpnConn
 						udwLog.Log("[zdb1mbq1v1kxh] vpn conn read use new vpn conn")

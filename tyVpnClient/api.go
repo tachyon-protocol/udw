@@ -8,7 +8,7 @@ import (
 )
 
 func CmdRun(req Config){
-	SetConfig(&req)
+	SetConfig(req)
 	SetOnChangeCallback("cmd",func(){
 		udwLog.Log("SetOnChangeCallback",GetVpnStatus(),GetLastError())
 	})
@@ -139,7 +139,12 @@ func GetLastError() string{
 	return s
 }
 
-
+func IsInnerCsDisconnected() bool{
+	gCsLocker.Lock()
+	innerCs:=gCsInnerCs
+	gCsLocker.Unlock()
+	return innerCs==innerCsDisconnected
+}
 
 const (
 	innerCsDisconnected = "Disconnected"

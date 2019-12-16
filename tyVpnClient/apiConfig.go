@@ -2,13 +2,13 @@ package tyVpnClient
 
 import (
 	"sync"
-	"github.com/tachyon-protocol/udw/udwJson"
+	"github.com/tachyon-protocol/udw/udwQueryOnlyUrl"
 	"github.com/tachyon-protocol/udw/tyTls"
 )
 
-func SetConfig(config *Config){
+func SetConfig(config Config){
 	gConfigLocker.Lock()
-	gConfig = *config
+	gConfig = config
 	gConfigLocker.Unlock()
 }
 
@@ -22,19 +22,44 @@ func getConfig() Config {
 	return thisConfig
 }
 
-func ParseAndVerifyConfigS(configS string) (config *Config,errMsg string){
-	err:=udwJson.UnmarshalFromString(configS,&config)
-	if err!=nil{
-		return nil,"svzvkntygd "+err.Error()
+func ParseAndVerifyConfigS(configS string) (config Config,errMsg string){
+	obj:=udwQueryOnlyUrl.ParseQueryUrlObj(configS)
+	if obj==nil{
+		return config,"5e7mgtu5rh"
 	}
-	if config.ServerIp==""{
-		return nil,"vzm3basqtz"
+	if obj.ProtocolName!="ty"{
+		return config,"2ssf326m86"
 	}
-	if config.ServerChk==""{
-		return nil,"jypzbufjf2"
+	ip:=obj.GetFirstValueByKey("ip")
+	if ip!=""{
+		config.ServerIp = ip
 	}
-	if tyTls.IsChkValid(config.ServerChk)==false{
-		return nil,"3kvmjwhcdy"
+	chk:=obj.GetFirstValueByKey("chk")
+	if chk!=""{
+		config.ServerChk = chk
+		if tyTls.IsChkValid(chk)==false{
+			return config,"w8j8y5jbvr"
+		}
+	}
+	t:=obj.GetFirstValueByKey("t")
+	if t!=""{
+		config.ServerTKey = t
 	}
 	return config,""
+}
+
+func MarshalConfig(config Config) (configS string){
+	obj:=udwQueryOnlyUrl.QueryUrlObj{
+		ProtocolName: "ty",
+	}
+	if config.ServerIp!=""{
+		obj.AddKv("ip",config.ServerIp)
+	}
+	if config.ServerTKey!=""{
+		obj.AddKv("t",config.ServerTKey)
+	}
+	if config.ServerChk!=""{
+		obj.AddKv("chk",config.ServerChk)
+	}
+	return obj.Marshal()
 }

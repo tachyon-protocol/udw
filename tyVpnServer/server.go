@@ -93,12 +93,14 @@ func (s *Server) Run(config ServerRunReq) {
 	})
 	udwErr.PanicIfErrorMsg(errMsg)
 	//fmt.Println("ServerChk: " + serverStorageInfo.ServerChk)
-	clientConnectConfigS:=udwJson.MustMarshalToString(tyVpnClient.Config{
+	clientConfig:=tyVpnClient.Config{
 		ServerIp: s.req.SelfIp,
 		ServerChk: serverStorageInfo.ServerChk,
 		ServerTKey: s.req.SelfTKey,
-	})
-	fmt.Println("ServerConnectKey: "+clientConnectConfigS)
+	}
+	clientConnectConfigS:=udwJson.MustMarshalToString(clientConfig)
+	fmt.Println("ServerConnectConfig: "+tyVpnClient.MarshalConfig(clientConfig))
+	fmt.Println("ServerConnectConfigJson: "+clientConnectConfigS)
 	fmt.Println("Server started ✔")
 	if s.req.BlockCountryCodeListS != "" {
 		s.blockCountryCodeList = strings.Split(s.req.BlockCountryCodeListS, ",")
