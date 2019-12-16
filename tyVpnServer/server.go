@@ -257,7 +257,7 @@ func (s *Server) clientTcpConnHandle(connToClient net.Conn) {
 				udwLog.Log("[swm1esf1kha1d] close conn cause no such client", vpnPacket.ClientIdSender, connToClient.RemoteAddr())
 				return
 			}
-			err:=writePacketFn(tyVpnProtocol.CmdPing,vpnPacket.Data)
+			err:=writePacketFn(tyVpnProtocol.CmdKeepAlive,vpnPacket.Data)
 			if err!=nil{
 				udwLog.Log("[2cpj1sbv37s] close conn", err)
 				_ = connToClient.Close()
