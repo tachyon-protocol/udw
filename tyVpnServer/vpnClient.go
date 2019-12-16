@@ -11,6 +11,7 @@ import (
 	"github.com/tachyon-protocol/udw/udwTlsSelfSignCertV2"
 	"net"
 	"sync"
+	"time"
 )
 
 type vpnClient struct {
@@ -21,6 +22,41 @@ type vpnClient struct {
 	connLock      sync.Mutex
 	connToClient  net.Conn
 	connRelaySide net.Conn
+
+	connLastRwTimeLock sync.Mutex
+	connLastRwTime time.Time
+}
+
+func (s *Server) gcClientThread() {
+	go func() {
+		for {
+			time.Sleep(time.Minute * 5)
+			s.lock.Lock()
+			now := time.Now()
+			for _, client := range s.clientMap {
+				client.connLastRwTimeLock.Lock()
+				t := client.connLastRwTime
+				client.connLastRwTimeLock.Unlock()
+				if now.Sub(t) < time.Minute*15 {
+					continue
+				}
+				udwLog.Log("[dzr1zb5e3wz] gc remove client", client.id)
+				if s.clientMap != nil {
+					delete(s.clientMap, client.id)
+				}
+				s.vpnIpList[client.vpnIpOffset] = nil
+				client.connLock.Lock()
+				if client.connToClient != nil {
+					_ = client.connToClient.Close()
+				}
+				if client.connRelaySide != nil {
+					_ = client.connRelaySide.Close()
+				}
+				client.connLock.Unlock()
+			}
+			s.lock.Unlock()
+		}
+	}()
 }
 
 func (vc *vpnClient) getConnToClient() net.Conn {
@@ -37,6 +73,11 @@ func (s *Server) getClient(clientId uint64) *vpnClient {
 	}
 	client := s.clientMap[clientId]
 	s.lock.Unlock()
+	if client != nil {
+		client.connLastRwTimeLock.Lock()
+		client.connLastRwTime = time.Now()
+		client.connLastRwTimeLock.Unlock()
+	}
 	return client
 }
 
