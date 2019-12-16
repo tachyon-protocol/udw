@@ -63,7 +63,7 @@ func (s *Server) Run(config ServerRunReq) {
 	s.req = config
 	s.clientId = tyVpnProtocol.GetClientId(0)
 	fmt.Println("ClientId:", s.clientId,"ProtocolVersion: ",tyVpnProtocol.Version)
-
+	s.gcClientThread()
 	tun, err := udwTapTun.NewTun("")
 	udwErr.PanicIfError(err)
 	err = udwTapTun.SetP2PIpAndUp(udwTapTun.SetP2PIpRequest{
@@ -233,13 +233,50 @@ func (s *Server) clientTcpConnHandle(connToClient net.Conn) {
 			return err
 		}
 		switch vpnPacket.Cmd {
-		case tyVpnProtocol.CmdPing, tyVpnProtocol.CmdKeepAlive:
-			err:=writePacketFn(vpnPacket.Cmd,vpnPacket.Data)
+		case tyVpnProtocol.CmdPing:
+			err:=writePacketFn(tyVpnProtocol.CmdPing,vpnPacket.Data)
 			if err!=nil{
 				udwLog.Log("[2cpj1sbv37s] close conn", err)
 				_ = connToClient.Close()
 				return
 			}
+			//bufW.Reset()
+			//vpnPacket.ClientIdReceiver = vpnPacket.ClientIdSender
+			//vpnPacket.ClientIdSender = s.clientId
+			//vpnPacket.Encode(bufW)
+			//err := udwBinary.WriteByteSliceWithUint32LenNoAllocV2(connToClient, bufW.GetBytes())
+			//if err != nil {
+			//	udwLog.Log("[2cpj1sbv37s] close conn", err)
+			//	_ = connToClient.Close()
+			//	return
+			//}
+		case tyVpnProtocol.CmdKeepAlive:
+			client := s.getClient(vpnPacket.ClientIdSender)
+			if client ==  nil {
+				_ = connToClient.Close()
+				udwLog.Log("[swm1esf1kha1d] close conn cause no such client", vpnPacket.ClientIdSender, connToClient.RemoteAddr())
+				return
+			}
+			err:=writePacketFn(tyVpnProtocol.CmdPing,vpnPacket.Data)
+			if err!=nil{
+				udwLog.Log("[2cpj1sbv37s] close conn", err)
+				_ = connToClient.Close()
+				return
+			}
+			//bufW.Reset()
+			//vpnPacket.ClientIdReceiver = vpnPacket.ClientIdSender
+			//vpnPacket.ClientIdSender = s.clientId
+			//vpnPacket.Encode(bufW)
+			//err = udwBinary.WriteByteSliceWithUint32LenNoAllocV2(connToClient, bufW.GetBytes())
+			//return err
+		//switch vpnPacket.Cmd {
+		//case tyVpnProtocol.CmdPing, tyVpnProtocol.CmdKeepAlive:
+		//	err:=writePacketFn(vpnPacket.Cmd,vpnPacket.Data)
+		//	if err!=nil{
+		//		udwLog.Log("[2cpj1sbv37s] close conn", err)
+		//		_ = connToClient.Close()
+		//		return
+		//	}
 		case tyVpnProtocol.CmdHandshake:
 			isOk:=false
 			if s.req.SelfTKey == "" {
