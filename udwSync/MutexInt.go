@@ -34,6 +34,13 @@ func (s *Int) AddAndReturnNew(toAdd int) int {
 	return v
 }
 
+func (s *Int) Inc() {
+	s.Add(1)
+}
+func (s *Int) Dec() {
+	s.Add(-1)
+}
+
 func NewInt(s int) *Int {
 	return &Int{
 		v: s,

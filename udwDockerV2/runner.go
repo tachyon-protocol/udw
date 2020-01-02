@@ -13,8 +13,7 @@ import (
 
 func BuildRunnerToDownload(pkgPath string, os string) {
 	resp := BuildRunner(pkgPath, os)
-	//copyFile := filepath.Join(udwFile.MustGetHomeDirPath(), "Downloads", getImageNameFromPkgPath(pkgPath)+resp.GetOutputExeFileExt())
-	copyFile := filepath.Join("/Users/Shared/Dev/Output", getImageNameFromPkgPath(pkgPath)+"-docker-runner-"+os+resp.GetOutputExeFileExt())
+	copyFile := filepath.Join(udwFile.MustGetHomeDirPath(), "Downloads", getImageNameFromPkgPath(pkgPath)+resp.GetOutputExeFileExt())
 	udwFile.MustCopy(resp.GetOutputExeFilePath(), copyFile)
 }
 

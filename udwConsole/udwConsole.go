@@ -2,7 +2,6 @@ package udwConsole
 
 import (
 	"fmt"
-	"github.com/tachyon-protocol/udw/udwJson"
 	"os"
 	"sort"
 	"strings"
@@ -141,7 +140,6 @@ func GetDefaultCommandGroup() *CommandGroup {
 }
 
 func (g *CommandGroup) CompleteCmd(args []string) (waitSelectList []string) {
-	udwJson.MustWriteFileIndent(`/tmp/1.json`, args)
 	if len(args) < 2 {
 		return nil
 	}

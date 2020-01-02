@@ -195,7 +195,7 @@ func (p *programV2) mustUdwGoInstall(cmdSlice []string) {
 
 		outputS := string(output)
 		if strings.Contains(outputS, "permission denied") {
-			udwCmd.MustRun("sudo chmod -R 777 pkg")
+			udwCmd.MustRun("sudo chmod -R 777 " + filepath.Join(p.goroot, "pkg"))
 			continue
 		}
 		if runtime.GOOS == `darwin` && strings.Contains(outputS, "xcrun: error: invalid active developer path") {
